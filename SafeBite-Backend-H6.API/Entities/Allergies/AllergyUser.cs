@@ -2,4 +2,7 @@
 
 public class AllergyUser
 {
+    public string UserId { get; set; } = null!;
+    public Guid AllergyId { get; set; }
+    public Allergy Allergy { get; set; } = null!;
 }

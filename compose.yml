@@ -1,16 +1,16 @@
 services:
   postgres:
     image: postgres:16
-    container_name: safebitevH6-postgres
+    container_name: safebiteH6-postgres
     restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: safebitevH6_app
+      POSTGRES_DB: safebiteH6_app
     ports:
       - "55432:5432"
     volumes:
-      - safebitevH6_postgres_data:/var/lib/postgresql/data
+      - safebiteH6_postgres_data:/var/lib/postgresql/data
 
 volumes:
-  safebitevH6_postgres_data:
+  safebiteH6_postgres_data:
