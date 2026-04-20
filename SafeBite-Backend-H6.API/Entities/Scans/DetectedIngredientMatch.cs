@@ -2,8 +2,4 @@
 
 public class DetectedIngredientMatch
 {
-    public Guid Id { get; set; }
-    public Guid ScanDetectedAllergyId { get; set; }
-    public string IngredientText { get; set; } = null!;
-    public ScanDetectedAllergies ScanDetectedAllergy { get; set; } = null!;
 }
