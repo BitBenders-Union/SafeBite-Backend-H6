@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using SafeBite_Backend_H6.API.Helpers.Form_Data_Helper;
-using SafeBite_Backend_H6.API.Interfaces.Services.OCR;
+﻿
 
 namespace SafeBiteApi.Controllers
 {
@@ -18,7 +16,7 @@ namespace SafeBiteApi.Controllers
 
         [HttpPost("extract")]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> Extract([FromForm] ExtractRequest request)
+        public async Task<IActionResult> Extract([FromForm] FormDataExtract request)
         {
             // Validering af input
             if (request == null || request.Image.Length == 0)
