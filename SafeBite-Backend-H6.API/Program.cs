@@ -1,6 +1,9 @@
 
 
 
+using SafeBite_Backend_H6.API.Auth;
+using Scalar.AspNetCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 
@@ -38,10 +41,16 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+
+builder.Services.AddOpenApi(options =>
+{
+    // scalar bearer token support - lets us set token once and have it apply to all endpoints in the docs
+    options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
+});
 
 var app = builder.Build();
 
+// seeding setup
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -59,11 +68,26 @@ using (var scope = app.Services.CreateScope())
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+
+    // scalar api docs
+    app.MapScalarApiReference(options =>
+    {
+        options.Title = "SafeBite API";
+        options.PersistentAuthentication = true;
+        options.Theme = ScalarTheme.DeepSpace;
+        options.Authentication = new ScalarAuthenticationOptions
+        {
+            PreferredSecuritySchemes = ["Bearer"]
+        };
+    });
 }
 
+app.UseAuthentication();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseCors("AllowAllOrigins");
 
 
 app.MapControllers();

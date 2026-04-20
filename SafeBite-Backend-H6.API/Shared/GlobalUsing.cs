@@ -1,6 +1,9 @@
 ﻿
 global using Microsoft.AspNetCore.Identity;
 global using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+global using Microsoft.AspNetCore.Authentication;
+global using Microsoft.AspNetCore.OpenApi;
+global using Microsoft.OpenApi;
 
 global using Microsoft.EntityFrameworkCore;
 
@@ -12,3 +15,5 @@ global using SafeBite_Backend_H6.API.Entities.Users;
 global using SafeBite_Backend_H6.API.Shared;
 global using SafeBite_Backend_H6.API.Data.Seeding.SeedingData;
 global using SafeBite_Backend_H6.API.Data.Seeding;
+
+
