@@ -1,0 +1,17 @@
+# Top-most EditorConfig file
+root = true
+
+[*.cs]
+# Core EditorConfig Rules
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# C# Formatting Rules
+# This forces File-Scoped Namespaces
+csharp_style_namespace_declarations = file_scoped:suggestion
+
+# Other helpful C# styles
+dotnet_style_require_accessibility_modifiers = for_non_interface_members:suggestion
+csharp_style_var_for_built_in_types = true:suggestion
