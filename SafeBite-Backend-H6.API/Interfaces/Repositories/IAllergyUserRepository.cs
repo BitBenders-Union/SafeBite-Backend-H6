@@ -1,5 +1,6 @@
 ﻿namespace SafeBite_Backend_H6.API.Interfaces.Repositories;
 
-public interface IAllergyUserRepository
+public interface IAllergyUserRepository : IBaseRepository<AllergyUser>
 {
+    IQueryable<AllergyUser> QueryFilter(string? searchTerm);
 }
