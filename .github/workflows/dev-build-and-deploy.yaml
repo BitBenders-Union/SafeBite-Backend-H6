@@ -65,7 +65,7 @@ jobs:
 
       - name: Build Docker image using existing Dockerfile
         run: |
-            cd SafeBiteV2/SafeBiteV2.API
+            cd SafeBite-Backend-H6.API/
             owner=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
             version="dev-${{ github.event.release.tag_name || github.run_number }}"
             echo "Building version: ${version}" 
