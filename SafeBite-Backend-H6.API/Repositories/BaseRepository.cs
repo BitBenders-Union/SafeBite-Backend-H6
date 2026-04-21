@@ -34,6 +34,13 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class
         // find kræver tracking og er optimeret til dette
     }
 
+    public virtual async Task<T?> GetByIdAsync(string id)
+    {
+        return await _context.Set<T>()
+            .FindAsync(id);
+        // find kræver tracking og er optimeret til dette
+    }
+
     public virtual void Update(T entity)
     {
         _context.Set<T>().Update(entity);
