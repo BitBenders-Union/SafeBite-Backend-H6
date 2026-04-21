@@ -15,8 +15,8 @@ global using SafeBite_Backend_H6.API.Entities.Users;
 global using SafeBite_Backend_H6.API.Shared;
 global using SafeBite_Backend_H6.API.Data.Seeding.SeedingData;
 global using SafeBite_Backend_H6.API.Data.Seeding;
+global using SafeBite_Backend_H6.API.Interfaces.Services;
+global using SafeBite_Backend_H6.API.Interfaces.Repositories;
 global using SafeBite_Backend_H6.API.Helpers.Form_Data_Helper;
 global using SafeBite_Backend_H6.API.Interfaces.Services.OCR;
-
-
 
