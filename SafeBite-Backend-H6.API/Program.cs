@@ -1,11 +1,4 @@
 
-using SafeBite_Backend_H6.API.Interfaces.Services.OCR;
-using SafeBiteApi.Services.OCR;
-using SafeBiteApi.Services.OCR.Engines;
-using SafeBiteApi.Services.OCR.Helpers;
-using SafeBite_Backend_H6.API.Auth;
-using Scalar.AspNetCore;
-
 var builder = WebApplication.CreateBuilder(args);
 
 
@@ -95,5 +88,12 @@ app.UseCors("AllowAllOrigins");
 
 
 app.MapControllers();
+app.MapGroup("/auth").MapCustomIdentityApi<ApplicationUser>();
+
+app.MapPost("/logout", async ([FromServices] SignInManager<ApplicationUser> signInManager) =>
+{
+    await signInManager.SignOutAsync();
+    return Results.Ok();
+}).RequireAuthorization();
 
 app.Run();
