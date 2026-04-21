@@ -118,4 +118,9 @@ public class ScanService : IScanService
 
         return deleted;
     }
+
+    public async Task<int> GetTotalCountAsync()
+    {
+        return await _scanRepository.CountAsync();
+    }
 }

@@ -107,4 +107,9 @@ public class CustomAllergyService : ICustomAllergyService
             })
             .ToListAsync();
     }
+
+    public async Task<int> GetTotalCountAsync()
+    {
+        return await _repository.CountAsync();
+    }
 }
