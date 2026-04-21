@@ -23,7 +23,6 @@ global using SafeBite_Backend_H6.API.Data.Seeding.SeedingData;
 global using SafeBite_Backend_H6.API.Data.Seeding;
 global using SafeBite_Backend_H6.API.Interfaces.Services;
 global using SafeBite_Backend_H6.API.Interfaces.Repositories;
-global using SafeBite_Backend_H6.API.Helpers.Form_Data_Helper;
 global using SafeBite_Backend_H6.API.Interfaces.Services.OCR;
 global using SafeBite_Backend_H6.API.Contracts.Responses;
 global using SafeBite_Backend_H6.API.Auth;
@@ -31,6 +30,8 @@ global using SafeBite_Backend_H6.API.Extensions;
 global using SafeBiteApi.Services.OCR;
 global using SafeBiteApi.Services.OCR.Engines;
 global using SafeBiteApi.Services.OCR.Helpers;
+global using SafeBite_Backend_H6.API.Contracts.Requests.Allergies;
+global using SafeBite_Backend_H6.API.Contracts.Requests.OCR;
 
 global using System.ComponentModel.DataAnnotations;
 global using System.Diagnostics;
