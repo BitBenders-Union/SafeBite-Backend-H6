@@ -13,12 +13,12 @@ public class CustomAllergyMappings
         };
     }
 
-    public static CustomAllergy ToEntity(CustomAllergyRequest request)
+    public static CustomAllergy ToEntity(CustomAllergyRequest request, string userId)
     {
         return new CustomAllergy
         {
             Id = Guid.NewGuid(),
-            UserId = request.UserId,
+            UserId = userId,
             Name = request.Name.Trim()
         };
     }

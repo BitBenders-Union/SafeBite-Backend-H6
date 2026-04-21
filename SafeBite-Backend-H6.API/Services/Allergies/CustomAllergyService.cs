@@ -9,56 +9,50 @@ public class CustomAllergyService : ICustomAllergyService
         _repository = repository;
     }
 
-    public async Task<PagedResult<CustomAllergyResponse>> GetCustomAllergiesPagedAsync(PaginationParameters parameters, string? searchTerm = null)
+    public async Task<PagedResult<CustomAllergyResponse>> GetCustomAllergiesPagedAsync(string userId, PaginationParameters parameters, string? searchTerm = null)
     {
-        var query = _repository.QueryFilter(searchTerm);
+        if (string.IsNullOrWhiteSpace(userId))
+            throw new ArgumentException("UserId cannot be empty or whitespace.", nameof(userId));
+
+        var query = _repository.QueryFilter(userId, searchTerm);
 
         PagedResult<CustomAllergy> result = await _repository.GetPagedAsync(parameters, query);
 
-        PagedResult<CustomAllergyResponse> pagedResult = result.Map(CustomAllergyMappings.ToResponse);
-
-        return pagedResult;
+        return result.Map(CustomAllergyMappings.ToResponse);
     }
 
-    public async Task<CustomAllergyResponse> AddCustomAllergyAsync(CustomAllergyRequest customAllergyRequest)
+    public async Task<CustomAllergyResponse> AddCustomAllergyAsync(CustomAllergyRequest customAllergyRequest, string userId)
     {
-
         ArgumentNullException.ThrowIfNull(customAllergyRequest);
 
-        if (customAllergyRequest.Name.Trim() == string.Empty)
+        if (string.IsNullOrWhiteSpace(customAllergyRequest.Name))
             throw new ArgumentException("Name cannot be empty or whitespace.", nameof(customAllergyRequest.Name));
 
-        if (customAllergyRequest.UserId.Trim() == string.Empty)
-            throw new ArgumentException("UserId cannot be empty or whitespace.", nameof(customAllergyRequest.UserId));
+        if (string.IsNullOrWhiteSpace(userId))
+            throw new ArgumentException("UserId cannot be empty or whitespace.", nameof(userId));
 
-        CustomAllergy customAllergy = CustomAllergyMappings.ToEntity(customAllergyRequest);
+        CustomAllergy customAllergy = CustomAllergyMappings.ToEntity(customAllergyRequest, userId);
 
         await _repository.AddAsync(customAllergy);
         await _repository.SaveChangesAsync();
 
-        var response = CustomAllergyMappings.ToResponse(customAllergy);
-
-        return response;
+        return CustomAllergyMappings.ToResponse(customAllergy);
     }
 
-    public async Task UpdateCustomAllergyAsync(CustomAllergyUpdateRequest customAllergyUpdateRequest)
+    public async Task UpdateCustomAllergyAsync(CustomAllergyUpdateRequest customAllergyUpdateRequest, string userId)
     {
         ArgumentNullException.ThrowIfNull(customAllergyUpdateRequest);
 
         if (customAllergyUpdateRequest.Id == Guid.Empty)
             throw new ArgumentException("Id cannot be empty.", nameof(customAllergyUpdateRequest.Id));
 
-        if (customAllergyUpdateRequest.Name.Trim() == string.Empty)
+        if (string.IsNullOrWhiteSpace(customAllergyUpdateRequest.Name))
             throw new ArgumentException("Name cannot be empty or whitespace.", nameof(customAllergyUpdateRequest.Name));
 
-        if (customAllergyUpdateRequest.UserId.Trim() == string.Empty)
-            throw new ArgumentException("UserId cannot be empty or whitespace.", nameof(customAllergyUpdateRequest.UserId));
+        if (string.IsNullOrWhiteSpace(userId))
+            throw new ArgumentException("UserId cannot be empty or whitespace.", nameof(userId));
 
-
-        CustomAllergy existingCustomAllergy = await GetCustomAllergyByIdAsync(customAllergyUpdateRequest.Id);
-
-        if (existingCustomAllergy == null)
-            throw new KeyNotFoundException($"Custom allergy with id {customAllergyUpdateRequest.Id} not found.");
+        CustomAllergy existingCustomAllergy = await GetCustomAllergyByIdAsync(customAllergyUpdateRequest.Id, userId);
 
         CustomAllergyMappings.ToEntityFromUpdateRequest(customAllergyUpdateRequest, existingCustomAllergy);
 
@@ -66,15 +60,15 @@ public class CustomAllergyService : ICustomAllergyService
         await _repository.SaveChangesAsync();
     }
 
-    public async Task<bool> DeleteAllergyAsync(Guid id)
+    public async Task<bool> DeleteAllergyAsync(Guid customAllergyId, string userId)
     {
-        if (id == Guid.Empty)
-            throw new ArgumentException("Id cannot be empty.", nameof(id));
+        if (customAllergyId == Guid.Empty)
+            throw new ArgumentException("Id cannot be empty.", nameof(customAllergyId));
 
-        if (await GetCustomAllergyByIdAsync(id) is null)
-            throw new KeyNotFoundException($"Custom allergy with id {id} not found.");
+        if (string.IsNullOrWhiteSpace(userId))
+            throw new ArgumentException("UserId cannot be empty or whitespace.", nameof(userId));
 
-        bool deleted = await _repository.DeleteAsync(id);
+        bool deleted = await _repository.DeleteAsync(customAllergyId, userId);
 
         if (deleted)
             await _repository.SaveChangesAsync();
@@ -82,17 +76,35 @@ public class CustomAllergyService : ICustomAllergyService
         return deleted;
     }
 
-
-    private async Task<CustomAllergy> GetCustomAllergyByIdAsync(Guid id)
+    private async Task<CustomAllergy> GetCustomAllergyByIdAsync(Guid customAllergyId, string userId)
     {
-        if (id == Guid.Empty)
-            throw new ArgumentException("Id cannot be empty.", nameof(id));
+        if (customAllergyId == Guid.Empty)
+            throw new ArgumentException("Id cannot be empty.", nameof(customAllergyId));
 
-        CustomAllergy? customAllergy = await _repository.GetByIdAsync(id);
+        if (string.IsNullOrWhiteSpace(userId))
+            throw new ArgumentException("UserId cannot be empty or whitespace.", nameof(userId));
 
-        if (customAllergy == null)
-            throw new KeyNotFoundException($"Custom allergy with id {id} not found.");
+        CustomAllergy? customAllergy = await _repository.GetByIdAsync(customAllergyId, userId);
+
+        if (customAllergy is null)
+            throw new KeyNotFoundException($"Custom allergy with id {customAllergyId} not found.");
 
         return customAllergy;
+    }
+
+    public async Task<List<AllergyAnalysisItem>> GetAnalysisItemsByUserIdAsync(string userId)
+    {
+        if (string.IsNullOrWhiteSpace(userId))
+            throw new ArgumentException("UserId cannot be empty or whitespace.", nameof(userId));
+
+        var query = _repository.QueryFilter(userId, null);
+
+        return await query
+            .Select(x => new AllergyAnalysisItem
+            {
+                AllergyId = x.Id,
+                AllergyName = x.Name
+            })
+            .ToListAsync();
     }
 }

@@ -2,5 +2,6 @@
 
 public interface IAllergyUserRepository : IBaseRepository<AllergyUser>
 {
-    IQueryable<AllergyUser> QueryFilter(string? searchTerm);
+    IQueryable<AllergyUser> QueryFilter(string userId, string? searchTerm);
+    Task<bool> DeleteAsync(Guid allergyId, string userId);
 }

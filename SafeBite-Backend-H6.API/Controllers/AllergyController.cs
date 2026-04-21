@@ -1,9 +1,8 @@
-﻿
-
-namespace SafeBite_Backend_H6.API.Controllers;
+﻿namespace SafeBite_Backend_H6.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class AllergyController : ControllerBase
 {
     private readonly IAllergyService _service;
@@ -39,6 +38,7 @@ public class AllergyController : ControllerBase
         }
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -62,7 +62,8 @@ public class AllergyController : ControllerBase
             return BadRequest(ex.Message);
         }
     }
-
+    
+    [Authorize(Roles = "Admin")]
     [HttpPut()]
     public async Task<IActionResult> UpdateAllergyAsync(AllergyUpdateRequest AllergyRq)
     {
@@ -81,12 +82,13 @@ public class AllergyController : ControllerBase
         }
     }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteAllergyAsync(Guid id)
+    [Authorize(Roles = "Admin")]
+    [HttpDelete("{allergyId}")]
+    public async Task<IActionResult> DeleteAllergyAsync(Guid allergyId)
     {
         try
         {
-            bool deleted = await _service.DeleteAllergyAsync(id);
+            bool deleted = await _service.DeleteAllergyAsync(allergyId);
             if (!deleted)
                 return NotFound();
             return NoContent();
