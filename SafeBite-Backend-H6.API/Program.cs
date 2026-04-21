@@ -35,9 +35,6 @@ builder.Services.AddCors(options =>
 });
 
 
-
-
-
 // Service Registrations
 # region Service Registrations
 
@@ -64,8 +61,6 @@ builder.Services.AddTransient<IEmailSender, EmailSender>();
 
 # endregion
 
-
-
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 
@@ -83,11 +78,14 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
 
     var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+    var config = services.GetRequiredService<IConfiguration>();
     var appDbContext = services.GetRequiredService<AppDbContext>();
 
     await appDbContext.Database.MigrateAsync();
 
     await RoleSeeding.SeedRolesAsync(roleManager);
+    await UserSeeding.SeedAdminAsync(userManager, config);
     await AllergySeeding.SeedAllergiesAsync(appDbContext);
 }
 
