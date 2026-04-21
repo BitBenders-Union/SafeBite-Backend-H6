@@ -13,6 +13,7 @@ global using Microsoft.AspNetCore.Identity.Data;
 global using Microsoft.AspNetCore.WebUtilities;
 global using Microsoft.Extensions.Options;
 global using Microsoft.EntityFrameworkCore;
+global using Microsoft.AspNetCore.Authorization;
 
 global using SafeBite_Backend_H6.API.Entities.Scans;
 global using SafeBite_Backend_H6.API.Entities.Allergies;
@@ -35,16 +36,30 @@ global using SafeBite_Backend_H6.API.Extensions;
 global using SafeBiteApi.Services.OCR;
 global using SafeBiteApi.Services.OCR.Engines;
 global using SafeBiteApi.Services.OCR.Helpers;
-global using SafeBite_Backend_H6.API.Contracts.Requests.Allergies;
 global using SafeBite_Backend_H6.API.Contracts.Requests.OCR;
+global using SafeBite_Backend_H6.API.Contracts.Requests.Scans;
+global using SafeBite_Backend_H6.API.Contracts.Responses.Scans;
+global using SafeBite_Backend_H6.API.Contracts.Responses.OCR;
+global using SafeBite_Backend_H6.API.Contracts.Requests.Analysis;
+global using SafeBite_Backend_H6.API.Contracts.Responses.Analysis;
+global using SafeBite_Backend_H6.API.Repositories;
+global using SafeBite_Backend_H6.API.Services.Allergies;
+global using SafeBite_Backend_H6.API.Services.Analysis;
+global using SafeBite_Backend_H6.API.Services.OCR;
 
+global using System.Text.RegularExpressions;
 global using System.ComponentModel.DataAnnotations;
 global using System.Diagnostics;
 global using System.Security.Claims;
 global using System.Text;
 global using System.Text.Encodings.Web;
+global using System.Net;
+global using System.Net.Mail;
 
-
+global using OpenAI.Chat;
 global using Scalar.AspNetCore;
+global using Tesseract;
 
-
+global using SixLabors.ImageSharp;
+global using SixLabors.ImageSharp.PixelFormats;
+global using SixLabors.ImageSharp.Processing;

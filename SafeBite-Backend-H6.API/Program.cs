@@ -1,6 +1,4 @@
-
-using SafeBite_Backend_H6.API.Repositories;
-using SafeBite_Backend_H6.API.Services.Allergies;
+using SafeBite_Backend_H6.API.Services.Scans;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,15 +45,21 @@ builder.Services.AddScoped<IImageProcessor, ImageProcessor>();
 builder.Services.AddScoped<IAiExtractor, AiExtractor>();
 builder.Services.AddScoped<IOcrService, OcrService>();
 
+builder.Services.AddScoped<IAllergyService, AllergyService>();
+builder.Services.AddScoped<IAllergyUserService, AllergyUserService>();
+builder.Services.AddScoped<ICustomAllergyService, CustomAllergyService>();
+
+builder.Services.AddScoped<IAllergyRepository, AllergyRepository>();
+builder.Services.AddScoped<IAllergyUserRepository, AllergyUserRepository>();
+builder.Services.AddScoped<ICustomAllergyRepository, CustomAllergyRepository>();
+
+builder.Services.AddScoped<IUserAllergyAnalysisService, UserAllergyAnalysisService>();
+
+builder.Services.AddScoped<IScanRepository, ScanRepository>();
+builder.Services.AddScoped<IScanService, ScanService>();
+builder.Services.AddScoped<IScanAnalysisService, ScanAnalysisService>();
+
 builder.Services.AddTransient<IEmailSender, EmailSender>();
-
-builder.Services.AddTransient<IAllergyService, AllergyService>();
-builder.Services.AddTransient<IAllergyUserService, AllergyUserService>();
-builder.Services.AddTransient<ICustomAllergyService, CustomAllergyService>();
-
-builder.Services.AddTransient<IAllergyRepository, AllergyRepository>();
-builder.Services.AddTransient<IAllergyUserRepository, AllergyUserRepository>();
-builder.Services.AddTransient<ICustomAllergyRepository, CustomAllergyRepository>();
 
 
 # endregion

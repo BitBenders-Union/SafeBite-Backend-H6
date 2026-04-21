@@ -13,11 +13,11 @@ public static class AllergyUserMappings
         };
     }
 
-    public static AllergyUser ToEntity(AllergyUserRequest allergyUserRequest, Allergy allergy)
+    public static AllergyUser ToEntity(AllergyUserRequest allergyUserRequest, Allergy allergy, string userId)
     {
         return new AllergyUser
         {
-            UserId = allergyUserRequest.UserId,
+            UserId = userId,
             AllergyId = allergyUserRequest.AllergyId,
             Allergy = allergy
         };

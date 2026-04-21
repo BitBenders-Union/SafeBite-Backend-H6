@@ -1,4 +1,4 @@
-﻿namespace SafeBite_Backend_H6.API.Contracts.Responses;
+﻿namespace SafeBite_Backend_H6.API.Contracts.Responses.Allergies;
 
 public class CustomAllergyResponse
 {

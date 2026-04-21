@@ -6,9 +6,9 @@ public class CustomAllergyRepository : BaseRepository<CustomAllergy>, ICustomAll
     {
     }
 
-    public IQueryable<CustomAllergy> QueryFilter(string? searchTerm)
+    public IQueryable<CustomAllergy> QueryFilter(string userId, string? searchTerm)
     {
-        var query = _context.CustomAllergies.AsNoTracking();
+        var query = _context.CustomAllergies.AsNoTracking().Where(a => a.UserId == userId);
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
@@ -23,5 +23,23 @@ public class CustomAllergyRepository : BaseRepository<CustomAllergy>, ICustomAll
         return await _context.CustomAllergies
             .AsNoTracking()
             .FirstOrDefaultAsync(a => a.Name.ToLower().Trim() == name.ToLower().Trim());
+    }
+
+    public async Task<bool> DeleteAsync(Guid customAllergyId, string userId)
+    {
+        var entity = await _context.CustomAllergies
+            .SingleOrDefaultAsync(x => x.Id == customAllergyId && x.UserId == userId);
+
+        if (entity is null)
+            return false;
+
+        _context.CustomAllergies.Remove(entity);
+        return true;
+    }
+
+    public async Task<CustomAllergy?> GetByIdAsync(Guid customAllergyId, string userId)
+    {
+        return await _context.CustomAllergies
+            .SingleOrDefaultAsync(x => x.Id == customAllergyId && x.UserId == userId);
     }
 }

@@ -1,8 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity.UI.Services;
-using System.Net;
-using System.Net.Mail;
-
-namespace SafeBite_Backend_H6.API.Services;
+﻿namespace SafeBite_Backend_H6.API.Services;
 
 public class EmailSender : IEmailSender
 {
