@@ -24,32 +24,35 @@ jobs:
           dotnet-version: "10.0"
 
       - name: Restore Dependencies
-        run: dotnet Restore SafeBite-Backend-H6.slnx
+        run: dotnet restore SafeBite-Backend-H6.slnx
 
       - name: Build Soulation
         run: dotnet build SafeBite-Backend-H6.slnx --configuration Release --no-restore
 
       - name: Run XUnit test with reports.
-        run: dotnet test SafeBite-Backend-H6.Test.csproj --configuration Release --no-build --logger "trx;LogFileName=TestResults.trx" --results-directory ./TestResults
         working-directory: ./SafeBite-Backend-H6.Test/
+        run: |
+          dotnet test SafeBite-Backend-H6.Test.csproj \
+          --configuration Release \
+          --no-build --logger "trx;LogFileName=TestResults.trx" --results-directory "TestResults"
 
+      #Uploads test results artifact
       - name: Upload test results artifact.
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: TestResults
-          path: ./SafeBite-Backend-H6.Test/TestResults/TestResults.trx
+          name: Test Results
+          path: SafeBite-Backend-H6.Test/TestResults/*.trx
           if-no-files-found: warn
-          compression-level: 6
-          overwrite: false
-          include-hidden-files: false
 
-      - name: Publish Test Results Summary.
+      - name: Publish Test Results Summary
+        if: always()
         uses: dorny/test-reporter@v1
-        if: always()  # runs even when tests fail
-        with: 
+        with:
           name: SafeBite API XUnit Tests Results
-          path: ./SafeBite-Backend-H6.Test/TestResults/*.trx
+          path: SafeBite-Backend-H6.Test/TestResults/*.trx
           reporter: dotnet-trx
+          fail-on-empty: false
 
       #Runs Creates cointainer from Docker File and Pushes it to VPS
       - name: Login to GitHub Container Registry
