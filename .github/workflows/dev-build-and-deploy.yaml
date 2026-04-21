@@ -112,7 +112,7 @@ jobs:
             docker ps -a --filter "name=${container_name}" --format "{{.ID}}" | xargs -r docker rm -f
 
             echo "Running new Dev container with HTTPS enabled..."
-            docker run -d -p 7070:80 -p 7443:443 --network safebite-network \
+            docker run -d -p 9070:80 -p 9443:443 --network safebite-network \
             -v /etc/letsencrypt/live/chimpchonkserver.duckdns.org:/https:ro \
             -e ConnectionStrings__AppConnection='${{ secrets.APP_DB }}' \
             -e ConnectionStrings__AuthConnection='${{ secrets.AUTH_DB }}' \
