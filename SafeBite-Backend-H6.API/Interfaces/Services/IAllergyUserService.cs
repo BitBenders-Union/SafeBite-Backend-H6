@@ -2,4 +2,7 @@
 
 public interface IAllergyUserService
 {
+    Task<AllergyUserResponse> AddAllergyUserAsync(AllergyUserRequest allergyUserRq);
+    Task<bool> DeleteAllergyUserAsync(Guid id);
+    Task<PagedResult<AllergyUserResponse>> GetAllergyUserPaged(PaginationParameters parameters, string? searchTerm = null);
 }

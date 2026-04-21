@@ -2,4 +2,6 @@
 
 public class AllergyRequest
 {
+    public required string Name { get; set; }
+    public string? Icon { get; set; }
 }

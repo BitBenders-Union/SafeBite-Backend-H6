@@ -19,4 +19,6 @@ global using SafeBite_Backend_H6.API.Interfaces.Services;
 global using SafeBite_Backend_H6.API.Interfaces.Repositories;
 global using SafeBite_Backend_H6.API.Helpers.Form_Data_Helper;
 global using SafeBite_Backend_H6.API.Interfaces.Services.OCR;
-
+global using SafeBite_Backend_H6.API.Contracts.Requests.Allergies;
+global using SafeBite_Backend_H6.API.Contracts.Responses.Allergies;
+global using SafeBite_Backend_H6.API.Mappings;
