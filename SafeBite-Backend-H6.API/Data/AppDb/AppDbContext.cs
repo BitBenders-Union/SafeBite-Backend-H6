@@ -15,6 +15,7 @@ public class AppDbContext : DbContext
     public DbSet<Scan> Scans => Set<Scan>();
     public DbSet<ScanDetectedAllergies> ScanDetectedAllergies => Set<ScanDetectedAllergies>();
     public DbSet<DetectedIngredientMatch> DetectedIngredientMatches => Set<DetectedIngredientMatch>();
+    public DbSet<CustomAllergy> CustomAllergies => Set<CustomAllergy>();
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -101,6 +102,21 @@ public class AppDbContext : DbContext
             .OnDelete(DeleteBehavior.Cascade);
 
             entity.HasIndex(dim => new { dim.ScanDetectedAllergyId, dim.IngredientText })
+            .IsUnique();
+
+        });
+
+        modelBuilder.Entity<CustomAllergy>(entity =>
+        {
+            entity.HasKey(ca => ca.Id);
+
+            entity.Property(ca => ca.UserId)
+            .IsRequired();
+
+            entity.Property(ca => ca.Name)
+            .IsRequired().HasMaxLength(100);
+
+            entity.HasIndex(ca => new { ca.UserId, ca.Name })
             .IsUnique();
 
         });

@@ -7,7 +7,7 @@ dotnet ef database update --context AuthDbContext
 
 
 cd .\SafeBite-Backend-H6.API
-dotnet ef migrations add {MigrationName} --context AppDbContext --output-dir Data/Migrations/App
+dotnet ef migrations add CustomAllergy --context AppDbContext --output-dir Data/Migrations/App
 dotnet ef database update --context AppDbContext
 
 

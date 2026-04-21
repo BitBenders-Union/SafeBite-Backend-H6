@@ -10,7 +10,7 @@ public static class AllergyMappings
         {
             Id = item.Id,
             Name = name.Length > 0 ? $"{char.ToUpper(name[0])}{name[1..]}" : name,
-            // check om der er mere end 0 chars. tag det første char og gøre det uppercase, tag resten af stringen eller tag stringen
+            // check om der er mere end 0 chars. tag det første char og gør det uppercase, tag resten af stringen eller tag stringen
             // x..y er en range operator : https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/member-access-operators#range-operator-
             Icon = item.Icon,
         };

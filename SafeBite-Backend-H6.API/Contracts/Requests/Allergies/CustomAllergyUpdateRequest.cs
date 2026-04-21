@@ -1,9 +1,8 @@
 ﻿namespace SafeBite_Backend_H6.API.Contracts.Requests.Allergies;
 
-public class AllergyUpdateRequest
+public class CustomAllergyUpdateRequest
 {
     public Guid Id { get; set; }
+    public required string UserId { get; set; }
     public required string Name { get; set; }
-    public string? Icon { get; set; }
-
 }
