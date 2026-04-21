@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="SafeBite-Backend-H6.API/SafeBite-Backend-H6.API.csproj" />
+  <Project Path="SafeBite-Backend-H6.Test/SafeBite-Backend-H6.Test.csproj" Id="79924e35-e676-4947-ab85-dccb1f30dc61" />
 </Solution>

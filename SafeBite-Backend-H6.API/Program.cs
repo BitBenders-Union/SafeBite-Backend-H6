@@ -1,6 +1,8 @@
 
-
-
+using SafeBite_Backend_H6.API.Interfaces.Services.OCR;
+using SafeBiteApi.Services.OCR;
+using SafeBiteApi.Services.OCR.Engines;
+using SafeBiteApi.Services.OCR.Helpers;
 using SafeBite_Backend_H6.API.Auth;
 using Scalar.AspNetCore;
 
@@ -14,7 +16,9 @@ builder.Services.AddDbContext<AuthDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("AuthConnection")));
 
 // Add services to the container.
-
+builder.Services.AddScoped<IImageProcessor, ImageProcessor>();
+builder.Services.AddScoped<IAiExtractor, AiExtractor>();
+builder.Services.AddScoped<IOcrService, OcrService>();
 
 // identity
 builder.Services
@@ -93,4 +97,3 @@ app.UseCors("AllowAllOrigins");
 app.MapControllers();
 
 app.Run();
-

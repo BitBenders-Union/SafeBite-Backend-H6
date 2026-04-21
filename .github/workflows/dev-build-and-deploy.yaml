@@ -1,0 +1,127 @@
+name: Test, Build and Deploy Dev Backend To VPS
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+   
+      - name: Checkout repository. 
+        uses: actions/checkout@v4
+
+
+      #Runs Backend Unit-test
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0"
+
+      - name: Restore Dependencies
+        run: dotnet Restore SafeBite-Backend-H6.slnx
+
+      - name: Build Soulation
+        run: dotnet build SafeBite-Backend-H6.slnx --configuration Release --no-restore
+
+      - name: Run XUnit test with reports.
+        run: dotnet test SafeBite-Backend-H6.Test.csproj --configuration Release --no-build --logger "trx;LogFileName=TestResults.trx" --results-directory ./TestResults
+        working-directory: ./SafeBite-Backend-H6.Test/
+
+      - name: Upload test results artifact.
+        uses: actions/upload-artifact@v4
+        with:
+          name: TestResults
+          path: ./SafeBite-Backend-H6.Test/TestResults/TestResults.trx
+          if-no-files-found: warn
+          compression-level: 6
+          overwrite: false
+          include-hidden-files: false
+
+      - name: Publish Test Results Summary.
+        uses: dorny/test-reporter@v1
+        if: always()  # runs even when tests fail
+        with: 
+          name: SafeBite API XUnit Tests Results
+          path: ./SafeBite-Backend-H6.Test/TestResults/*.trx
+          reporter: dotnet-trx
+
+      #Runs Creates cointainer from Docker File and Pushes it to VPS
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Docker image using existing Dockerfile
+        run: |
+            cd SafeBiteV2/SafeBiteV2.API
+            owner=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+            version="dev-${{ github.event.release.tag_name || github.run_number }}"
+            echo "Building version: ${version}" 
+
+            # Use the Dockerfile from the current directory
+            
+            docker build -f Dockerfile \
+              -t ghcr.io/${owner}/dev-safebite-api:${version} \
+              -t ghcr.io/${owner}/dev-safebite-api:latest .
+
+      - name: Push Dev Container image to GitHub Container Registry
+        run: |
+              owner=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+              version="dev-${{ github.event.release.tag_name || github.run_number }}"
+              docker push ghcr.io/${owner}/dev-safebite-api:${version}
+              docker push ghcr.io/${owner}/dev-safebite-api:latest
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    environment: VPS_DEV
+
+    steps:
+      - name: SSH to VPS and deploy DEV API container
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: chimpchonkserver.duckdns.org
+          username: githubaction
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            owner=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+            version="dev-${{ github.event.release.tag_name || github.run_number }}"
+
+            # define a container name so docker run receives a valid --name argument
+            container_name="dev-safebite-api"
+
+            echo "Logging in to Docker registry..."
+            docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
+
+            echo "Pulling version ${version}..."
+            docker pull ghcr.io/${owner}/dev-safebite-api:${version}
+
+            echo "Stopping existing Dev container (if any)..."
+            docker ps -a --filter "name=${container_name}" --format "{{.ID}}" | xargs -r docker rm -f
+
+            echo "Running new Dev container with HTTPS enabled..."
+            docker run -d -p 7070:80 -p 7443:443 --network safebite-network \
+            -v /etc/letsencrypt/live/chimpchonkserver.duckdns.org:/https:ro \
+            -e ConnectionStrings__AppConnection='${{ secrets.APP_DB }}' \
+            -e ConnectionStrings__AuthConnection='${{ secrets.AUTH_DB }}' \
+            -e ASPNETCORE_URLS='https://+;http://+' \
+            -e ASPNETCORE_HTTPS_PORT=443 \
+            -e ASPNETCORE_ENVIRONMENT=Development \
+            -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/safebite.pfx \
+            -e ASPNETCORE_Kestrel__Certificates__Default__Password='${{ secrets.SSL_PASS }}' \
+            -e Email__From='jonas.boe1234@gmail.com' \
+            -e Email__Username='${{ secrets.EMAIL_USER }}' \
+            -e Email__Password='${{ secrets.EMAIL_PASS }}' \
+            -e Email__Host='${{ secrets.EMAIL_HOST }}' \
+            -e Email__Port='587' \
+            -e Email__EnableSsl='true' \
+            --name "${container_name}" ghcr.io/${owner}/dev-safebite-api:${version}
+
+            echo "Deployed"
