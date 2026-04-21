@@ -6,6 +6,8 @@ using SafeBiteApi.Services.OCR.Helpers;
 using SafeBite_Backend_H6.API.Auth;
 using Scalar.AspNetCore;
 
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 
@@ -42,6 +44,21 @@ builder.Services.AddCors(options =>
               .AllowAnyMethod();
     });
 });
+
+
+
+
+
+// Service Registrations
+# region Service Registrations
+
+builder.Services.AddTransient<IEmailSender, EmailSender>();
+
+
+
+# endregion
+
+
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
