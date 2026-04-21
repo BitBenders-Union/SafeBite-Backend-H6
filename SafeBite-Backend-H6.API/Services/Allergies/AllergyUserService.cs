@@ -51,7 +51,7 @@ public class AllergyUserService : IAllergyUserService
         if (id == Guid.Empty)
             throw new ArgumentException("Id cannot be empty.");
 
-        bool deleted = await _repository.Delete(id);
+        bool deleted = await _repository.DeleteAsync(id);
 
         if (deleted)
             await _repository.SaveChangesAsync();

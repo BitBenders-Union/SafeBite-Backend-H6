@@ -15,7 +15,7 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class
         // save from service and set error message there if any
     }
 
-    public virtual async Task<bool> Delete(Guid id)
+    public virtual async Task<bool> DeleteAsync(Guid id)
     {
         var entity = await _context.Set<T>().FindAsync(id);
 
