@@ -78,7 +78,7 @@ public class AllergyService : IAllergyService
         ArgumentNullException.ThrowIfNull(allergyRq);
 
         // id er nødvendig for update, da vi skal vide hvilken allergi der skal opdateres
-        if (allergyRq.Id == string.Empty)
+        if (allergyRq.Id == Guid.Empty)
             throw new ArgumentException("Id is required for update.");
 
         var name = allergyRq.Name?.Trim();
@@ -104,7 +104,7 @@ public class AllergyService : IAllergyService
         if (id == Guid.Empty)
             throw new ArgumentException("Id cannot be empty.");
 
-        bool deleted = await _repository.Delete(id);
+        bool deleted = await _repository.DeleteAsync(id);
 
         if (deleted)
             await _repository.SaveChangesAsync();

@@ -1,12 +1,6 @@
 
-using SafeBite_Backend_H6.API.Interfaces.Services.OCR;
-using SafeBiteApi.Services.OCR;
-using SafeBiteApi.Services.OCR.Engines;
-using SafeBiteApi.Services.OCR.Helpers;
-using SafeBite_Backend_H6.API.Auth;
-using Scalar.AspNetCore;
-
-
+using SafeBite_Backend_H6.API.Repositories;
+using SafeBite_Backend_H6.API.Services.Allergies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,10 +11,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddDbContext<AuthDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("AuthConnection")));
 
-// Add services to the container.
-builder.Services.AddScoped<IImageProcessor, ImageProcessor>();
-builder.Services.AddScoped<IAiExtractor, AiExtractor>();
-builder.Services.AddScoped<IOcrService, OcrService>();
+
 
 // identity
 builder.Services
@@ -52,8 +43,19 @@ builder.Services.AddCors(options =>
 // Service Registrations
 # region Service Registrations
 
+builder.Services.AddScoped<IImageProcessor, ImageProcessor>();
+builder.Services.AddScoped<IAiExtractor, AiExtractor>();
+builder.Services.AddScoped<IOcrService, OcrService>();
+
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 
+builder.Services.AddTransient<IAllergyService, AllergyService>();
+builder.Services.AddTransient<IAllergyUserService, AllergyUserService>();
+builder.Services.AddTransient<ICustomAllergyService, CustomAllergyService>();
+
+builder.Services.AddTransient<IAllergyRepository, AllergyRepository>();
+builder.Services.AddTransient<IAllergyUserRepository, AllergyUserRepository>();
+builder.Services.AddTransient<ICustomAllergyRepository, CustomAllergyRepository>();
 
 
 # endregion
