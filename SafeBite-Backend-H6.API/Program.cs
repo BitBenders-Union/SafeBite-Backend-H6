@@ -112,5 +112,12 @@ app.UseCors("AllowAllOrigins");
 
 
 app.MapControllers();
+app.MapGroup("/auth").MapCustomIdentityApi<ApplicationUser>();
+
+app.MapPost("/logout", async ([FromServices] SignInManager<ApplicationUser> signInManager) =>
+{
+    await signInManager.SignOutAsync();
+    return Results.Ok();
+}).RequireAuthorization();
 
 app.Run();

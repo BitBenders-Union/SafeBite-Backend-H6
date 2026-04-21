@@ -1,10 +1,12 @@
-﻿
+﻿using Microsoft.AspNetCore.Mvc;
+using SafeBite_Backend_H6.API.Contracts.Requests.OCR;
+using SafeBite_Backend_H6.API.Interfaces.Services.OCR;
 
 namespace SafeBiteApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class OcrController : ControllerBase 
+    public class OcrController : ControllerBase
     {
         private readonly IOcrService _ocrService;
         private const string DefaultOcrLanguages = "eng+dan+swe+nor+fra";
@@ -16,29 +18,28 @@ namespace SafeBiteApi.Controllers
 
         [HttpPost("extract")]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> Extract([FromForm] FormDataExtract request)
+        public async Task<IActionResult> Extract([FromForm] OcrExtractRequest request)
         {
-            // Validering af input
-            if (request == null || request.Image.Length == 0)
+            // Validering via DTO'en
+            if (request.Image == null || request.Image.Length == 0)
             {
                 return BadRequest("No image file uploaded.");
             }
 
-            // Bestem sprog (fallback til standard hvis intet er valgt)
-            var languages = string.IsNullOrWhiteSpace(request.Lang) ? DefaultOcrLanguages : request.Lang;
+            // Brug værdien fra request eller fald tilbage til standard
+            var languages = string.IsNullOrWhiteSpace(request.Lang)
+                ? DefaultOcrLanguages
+                : request.Lang;
 
             try
             {
-                // Åbn stream og kør processen
                 using var stream = request.Image.OpenReadStream();
                 var result = await _ocrService.ExtractTextFromImageAsync(stream, languages);
 
-                // Returnér resultatet
                 return Ok(result);
             }
             catch (Exception ex)
             {
-                // Log fejlen
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
