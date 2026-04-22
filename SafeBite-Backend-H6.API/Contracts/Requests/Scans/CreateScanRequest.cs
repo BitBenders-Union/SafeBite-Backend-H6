@@ -4,5 +4,5 @@ public class CreateScanRequest
 {
     public IFormFile Image { get; set; } = null!;
     public string? Name { get; set; }
-    public string Lang { get; set; }
+    public string? Lang { get; set; } = "da+en+fra+nor";
 }

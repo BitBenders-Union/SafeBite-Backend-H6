@@ -1,4 +1,6 @@
 using SafeBite_Backend_H6.API.Services.Scans;
+using SafeBiteApi.Services.Analysis;
+using SafeBiteApi.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -58,6 +60,7 @@ builder.Services.AddScoped<IUserAllergyAnalysisService, UserAllergyAnalysisServi
 builder.Services.AddScoped<IScanRepository, ScanRepository>();
 builder.Services.AddScoped<IScanService, ScanService>();
 builder.Services.AddScoped<IScanAnalysisService, ScanAnalysisService>();
+builder.Services.AddScoped<IAllergyMatcher, AllergyMatcher>();
 
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 

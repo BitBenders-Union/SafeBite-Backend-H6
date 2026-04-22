@@ -19,4 +19,9 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="AIAnalyse\" />
+    <Folder Include="OCR\" />
+  </ItemGroup>
+
 </Project>
