@@ -13,7 +13,7 @@ public class AllergyRepository : BaseRepository<Allergy>, IAllergyRepository
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
-            query = query.Where(a => a.Name.Contains(searchTerm.Trim()));
+            query = query.Where(a => a.NormalizedName.Contains(StringHelpers.NormalizeName(searchTerm)));
         }
 
         return query.OrderBy(a => a.Name);
@@ -23,7 +23,7 @@ public class AllergyRepository : BaseRepository<Allergy>, IAllergyRepository
     {
         return await _context.Allergies
             .AsNoTracking()
-            .FirstOrDefaultAsync(a => a.Name.ToLower().Trim() == name.ToLower().Trim());
+            .FirstOrDefaultAsync(a => a.NormalizedName == StringHelpers.NormalizeName(name));
     }
 }
 

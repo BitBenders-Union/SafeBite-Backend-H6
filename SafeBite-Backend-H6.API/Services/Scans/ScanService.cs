@@ -51,7 +51,7 @@ public class ScanService : IScanService
 
         var analysisResult = await _scanAnalysisService.AnalyzeIngredientsAsync(analysisRequest);
 
-        Scan scan = ScanMappings.ToEntity(userId, request.Name, analysisResult);
+        Scan scan = ScanMappings.ToScanEntity(userId, request.Name, analysisResult);
 
         await _scanRepository.AddAsync(scan);
         await _scanRepository.SaveChangesAsync();
@@ -61,7 +61,7 @@ public class ScanService : IScanService
         if (createdScan is null)
             throw new KeyNotFoundException("Created scan could not be reloaded.");
 
-        return ScanMappings.ToResponse(createdScan);
+        return ScanMappings.ToScanResponse(createdScan);
     }
 
     public async Task<PagedResult<ScanResponse>> GetPagedByUserIdAsync(string userId, PaginationParameters parameters, string? searchTerm = null, bool? hasDetectedAllergies = null)
@@ -75,7 +75,7 @@ public class ScanService : IScanService
 
         PagedResult<Scan> result = await _scanRepository.GetPagedAsync(parameters, query);
 
-        return result.Map(ScanMappings.ToResponse);
+        return result.Map(ScanMappings.ToScanResponse);
     }
 
     public async Task<ScanResponse?> GetByIdAsync(string userId, Guid scanId)
@@ -93,7 +93,7 @@ public class ScanService : IScanService
         if (scan is null)
             return null;
 
-        return ScanMappings.ToResponse(scan);
+        return ScanMappings.ToScanResponse(scan);
     }
 
     public async Task<bool> DeleteAsync(string userId, Guid scanId)
