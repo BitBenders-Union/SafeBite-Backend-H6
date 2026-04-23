@@ -23,7 +23,7 @@ public class AllergyRepository : BaseRepository<Allergy>, IAllergyRepository
     {
         return await _context.Allergies
             .AsNoTracking()
-            .FirstOrDefaultAsync(a => a.Name.ToLower().Trim() == name.ToLower().Trim());
+            .SingleOrDefaultAsync(a => a.Name.ToLower().Trim() == name.ToLower());
     }
 }
 
