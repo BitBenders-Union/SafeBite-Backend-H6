@@ -1,6 +1,4 @@
-﻿
-
-namespace SafeBite_Backend_H6.API.Entities.Allergies;
+﻿namespace SafeBite_Backend_H6.API.Entities.Allergies;
 
 public class Allergy
 {

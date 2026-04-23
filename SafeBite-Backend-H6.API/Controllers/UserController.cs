@@ -1,5 +1,6 @@
 ﻿namespace SafeBite_Backend_H6.API.Controllers;
 
+[Authorize(Roles = "Admin")]
 [Route("api/[controller]")]
 [ApiController]
 public class UserController : ControllerBase
@@ -33,5 +34,4 @@ public class UserController : ControllerBase
         var totalInactiveUserCount = await _userService.GetTotalInactiveUserCount();
         return Ok(totalInactiveUserCount);
     }
-
 }
