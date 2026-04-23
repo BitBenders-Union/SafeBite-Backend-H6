@@ -5,14 +5,13 @@ using SafeBite_Backend_H6.API.Shared;
 
 namespace SafeBite_Backend_H6.Benchmark.Allergies;
 
-[HtmlExporter]
-[CsvExporter]
+[RPlotExporter]
 public class GetPagedAllergyBencmark : BaseAllergyBenchmark
 {
     [Params(5, 10, 20)]
     public int PageSize { get; set; }
 
-    [Params(null, "s", "soy")]
+    [Params("", "s", "soy")]
     public string? SearchTerm { get; set; }
 
     [Benchmark]

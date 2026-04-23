@@ -63,3 +63,18 @@ srddev er variation mellem målinger. 13.21 mikrosekunder
 1 ms = 1000 us
 us = mikrosekunder
 
+
+
+til rplotter er der en bug i det genererede output, vi bliver derfor nødt til manuelt at rette det til
+"...\SafeBite-Backend-H6\SafeBite-Backend-H6.Benchmark\BenchmarkDotNet.Artifacts\results\BuildPlots.R"
+
+skal resultstats overskrives til nedenstående:
+
+resultStats <- result %>%
+  group_by(Target_Method, Job_Id) %>%
+  summarise(
+    se = std.error(Measurement_Value),
+    Value = mean(Measurement_Value),
+    .groups = "drop"
+  )
+
