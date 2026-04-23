@@ -46,6 +46,9 @@ global using SafeBite_Backend_H6.API.Repositories;
 global using SafeBite_Backend_H6.API.Services.Allergies;
 global using SafeBite_Backend_H6.API.Services.Analysis;
 global using SafeBite_Backend_H6.API.Services.OCR;
+global using SafeBite_Backend_H6.API.Interfaces.Services.Users;
+global using SafeBite_Backend_H6.API.Services.Scans;
+global using SafeBite_Backend_H6.API.Services.Users;
 
 global using System.Text.RegularExpressions;
 global using System.ComponentModel.DataAnnotations;

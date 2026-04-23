@@ -85,5 +85,13 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class
             Data = data
         };
     }
+
+    public async Task<int> CountAsync()
+    {
+        return await _context.Set<T>()
+            .AsNoTracking()
+            .CountAsync();
+    }
+
 }
 

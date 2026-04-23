@@ -11,4 +11,5 @@ public interface IScanService
     Task<ScanResponse?> GetByIdAsync(string userId, Guid scanId);
 
     Task<bool> DeleteAsync(string userId, Guid scanId);
+    Task<int> GetTotalCountAsync();
 }

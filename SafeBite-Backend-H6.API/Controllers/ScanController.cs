@@ -58,4 +58,12 @@ public class ScanController : ControllerBase
 
         return NoContent();
     }
+
+    [Authorize(Roles = "Admin")]
+    [HttpGet("total-count")]
+    public async Task<IActionResult> GetTotalCount()
+    {
+        var totalCount = await _scanService.GetTotalCountAsync();
+        return Ok(new { TotalScanCount = totalCount });
+    }
 }

@@ -112,6 +112,11 @@ public class AllergyService : IAllergyService
         return deleted;
     }
 
+    public async Task<int> GetTotalCountAsync()
+    {
+        return await _repository.CountAsync();
+    }
+
 
 }
 
