@@ -6,4 +6,5 @@ public interface IAllergyUserService
     Task<bool> DeleteAllergyUserAsync(Guid id, string userId);
     Task<PagedResult<AllergyUserResponse>> GetAllergyUserPaged(string userId, PaginationParameters parameters, string? searchTerm = null);
     Task<List<AllergyAnalysisItem>> GetAnalysisItemsByUserIdAsync(string userId);
+    Task<int> GetTotalCountAsync();
 }

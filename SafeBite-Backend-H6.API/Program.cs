@@ -1,4 +1,4 @@
-using SafeBite_Backend_H6.API.Services.Scans;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,6 +45,7 @@ builder.Services.AddScoped<IOcrService, OcrService>();
 builder.Services.AddScoped<IAllergyService, AllergyService>();
 builder.Services.AddScoped<IAllergyUserService, AllergyUserService>();
 builder.Services.AddScoped<ICustomAllergyService, CustomAllergyService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddScoped<IAllergyRepository, AllergyRepository>();
 builder.Services.AddScoped<IAllergyUserRepository, AllergyUserRepository>();
