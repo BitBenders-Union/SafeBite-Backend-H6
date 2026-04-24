@@ -10,7 +10,12 @@ public class UserManagementRepository : IUserManagementRepository
 
     public IQueryable<ApplicationUser> QueryFilter(string? searchTerm)
     {
-        var query = _context.Users.Include(u => u.UserRoles).ThenInclude(ur => ur.Role).AsQueryable();
+        // should this include deactivated users?
+        // if not we need to add it to the query.
+        var query = _context.Users
+            .Include(u => u.UserRoles)
+            .ThenInclude(ur => ur.Role)
+            .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
             query = query.Where(u => u.Email!.Contains(searchTerm) || u.UserName!.Contains(searchTerm));

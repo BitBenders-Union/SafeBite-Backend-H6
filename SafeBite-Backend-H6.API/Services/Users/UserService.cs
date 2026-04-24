@@ -1,6 +1,4 @@
-﻿
-
-namespace SafeBite_Backend_H6.API.Services.Users;
+﻿namespace SafeBite_Backend_H6.API.Services.Users;
 
 public class UserService : IUserService
 {
