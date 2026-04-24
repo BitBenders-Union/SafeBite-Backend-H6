@@ -14,6 +14,8 @@ global using Microsoft.AspNetCore.WebUtilities;
 global using Microsoft.Extensions.Options;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.AspNetCore.Authorization;
+global using Microsoft.AspNetCore.RateLimiting;
+global using System.Threading.RateLimiting;
 
 global using SafeBite_Backend_H6.API.Entities.Scans;
 global using SafeBite_Backend_H6.API.Entities.Allergies;
