@@ -127,8 +127,10 @@ using (var scope = app.Services.CreateScope())
     var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
     var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
     var config = services.GetRequiredService<IConfiguration>();
+    var authDbContext = services.GetRequiredService<AuthDbContext>();
     var appDbContext = services.GetRequiredService<AppDbContext>();
 
+    await authDbContext.Database.MigrateAsync();
     await appDbContext.Database.MigrateAsync();
 
     await RoleSeeding.SeedRolesAsync(roleManager);
