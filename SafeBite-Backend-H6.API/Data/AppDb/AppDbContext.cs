@@ -31,7 +31,11 @@ public class AppDbContext : DbContext
                 .IsRequired()
                 .HasMaxLength(100);
 
-            entity.HasIndex(a => a.Name) // laver Name unique og sætter index
+            entity.Property(a => a.NormalizedName) 
+                .IsRequired()
+                .HasMaxLength(100);
+
+            entity.HasIndex(a => a.NormalizedName) // laver Name unique og sætter index
                 .IsUnique();
         });
 
@@ -111,13 +115,18 @@ public class AppDbContext : DbContext
             entity.HasKey(ca => ca.Id);
 
             entity.Property(ca => ca.UserId)
-            .IsRequired();
+                .IsRequired();
 
             entity.Property(ca => ca.Name)
-            .IsRequired().HasMaxLength(100);
+                .IsRequired()
+                .HasMaxLength(100);
 
-            entity.HasIndex(ca => new { ca.UserId, ca.Name })
-            .IsUnique();
+            entity.Property(ca => ca.NormalizedName)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            entity.HasIndex(ca => new { ca.UserId, ca.NormalizedName })
+                .IsUnique();
 
         });
 

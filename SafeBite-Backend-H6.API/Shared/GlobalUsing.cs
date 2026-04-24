@@ -52,7 +52,9 @@ global using SafeBite_Backend_H6.API.Services.Users;
 global using SafeBiteV2.API.Contracts.Responses.UserManagement;
 global using SafeBite_Backend_H6.API.Contracts.Responses.UserManagement;
 
+global using SafeBite_Backend_H6.API.Utilities;
 
+global using System.Globalization;
 global using System.Text.RegularExpressions;
 global using System.ComponentModel.DataAnnotations;
 global using System.Diagnostics;
