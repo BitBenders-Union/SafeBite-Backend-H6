@@ -136,7 +136,7 @@ jobs:
             -e Email__Port='587' \
             -e Email__EnableSsl='true' \
             -e Seed__AdminEmail='${{ secrets.ADMIN_EMAIL }}' \
-            -e Seed_AdminPassword='${{ secrets.ADMIN_PASS }}' \
+            -e Seed__AdminPassword='${{ secrets.ADMIN_PASS }}' \
             --name "${container_name}" ghcr.io/${owner}/dev-safebite-api:${version}
 
             echo "Deployed"
