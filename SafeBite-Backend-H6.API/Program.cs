@@ -50,6 +50,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAllergyRepository, AllergyRepository>();
 builder.Services.AddScoped<IAllergyUserRepository, AllergyUserRepository>();
 builder.Services.AddScoped<ICustomAllergyRepository, CustomAllergyRepository>();
+builder.Services.AddScoped<IUserManagementRepository, UserManagementRepository>();
 
 builder.Services.AddScoped<IUserAllergyAnalysisService, UserAllergyAnalysisService>();
 

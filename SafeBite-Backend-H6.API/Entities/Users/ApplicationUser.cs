@@ -4,5 +4,6 @@ public class ApplicationUser : IdentityUser
 {
     public bool IsDeactivated { get; set; } = false;
     public DateTime? DeactivatedTime { get; set; }
+    public ICollection<ApplicationUserRole> UserRoles { get; set; }
 
 }
