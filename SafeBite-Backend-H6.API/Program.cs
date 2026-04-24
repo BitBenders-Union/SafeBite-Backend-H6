@@ -1,5 +1,3 @@
-
-
 var builder = WebApplication.CreateBuilder(args);
 
 
@@ -21,6 +19,53 @@ builder.Services
     .AddEntityFrameworkStores<AuthDbContext>();
 
 
+// https://learn.microsoft.com/en-us/aspnet/core/performance/rate-limit?view=aspnetcore-10.0
+// follow microsoft's reccomendation.
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests; // proper status code instead of 503
+
+
+    // global limit applies different limits for admins and non-admins.
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+    {
+        var isAdmin = httpContext.User.IsInRole("Admin");
+        var userId = httpContext.User.FindFirstValue(ClaimTypes.NameIdentifier) // userId from token
+        ?? httpContext.Connection.RemoteIpAddress?.ToString() // if user is not found we use ip address as the specific limiter key.
+        ?? "anonymous"; // last fallback if the client for some reason do not have an ip. 
+        var partitionKey = isAdmin ? $"Admin:{userId}" : $"Standard:{userId}";
+        // need userId or everyone would share the same limit pool. (user1 and user2 would have 40 request total together instead of 40 each)
+
+        return RateLimitPartition.GetFixedWindowLimiter(partitionKey, _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = isAdmin ? 200 : 50,
+            Window = TimeSpan.FromMinutes(1),
+            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+            QueueLimit = 0,
+            AutoReplenishment = true
+        });
+    });
+
+    // specific limit for scan
+    options.AddPolicy(RateLimitPolicyNames.Scan, httpContext =>
+    {
+        // we need to seperate the users again or everyone will share the same limit of 10.
+        var userId = httpContext.User.FindFirstValue(ClaimTypes.NameIdentifier)
+            ?? httpContext.Connection.RemoteIpAddress?.ToString()
+            ?? "anonymous";
+
+        return RateLimitPartition.GetFixedWindowLimiter(
+            $"Scan:{userId}",
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 10,
+                Window = TimeSpan.FromMinutes(1),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 4,
+                AutoReplenishment = true
+            });
+    });
+});
 
 
 // Configure CORS
@@ -116,6 +161,7 @@ app.UseAuthorization();
 
 app.UseCors("AllowAllOrigins");
 
+app.UseRateLimiter();
 
 app.MapControllers();
 app.MapGroup("/auth").MapCustomIdentityApi<ApplicationUser>();

@@ -12,6 +12,7 @@ public class ScanController : ControllerBase
         _scanService = scanService;
     }
 
+    [EnableRateLimiting(RateLimitPolicyNames.Scan)]
     [HttpPost]
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> Create([FromForm] CreateScanRequest request)
