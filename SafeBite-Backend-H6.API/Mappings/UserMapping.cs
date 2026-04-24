@@ -10,7 +10,7 @@ public class UserMapping
             Email = user.Email,
             IsActive = !user.IsDeactivated,
             IsLocked = user.LockoutEnd != null && user.LockoutEnd > DateTimeOffset.UtcNow,
-            Roles = user.UserRoles.Select(ur => new UserRoleResponse
+            Roles = user.UserRoles.Select(ur => new RoleResponse
             {
                 RoleId = ur.Role.Id,
                 RoleName = ur.Role.Name!

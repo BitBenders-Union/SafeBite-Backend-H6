@@ -5,34 +5,71 @@ public class UserManagementService : IUserManagementService
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
     private readonly IUserManagementRepository _userManagementRepository;
-    private readonly IUserService _userService;
 
-    public UserManagementService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IUserManagementRepository userManagementRepository, IUserService userService)
+    public UserManagementService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IUserManagementRepository userManagementRepository)
     {
         _userManager = userManager;
         _roleManager = roleManager;
         _userManagementRepository = userManagementRepository;
-        _userService = userService;
     }
 
-    public Task ActivateUserAsync(string userId)
+    public async Task ActivateUserAsync(string userId)
     {
-        throw new NotImplementedException();
+        var user = await _userManager.FindByIdAsync(userId);
+
+        if (user == null)
+            throw new KeyNotFoundException("User not found");
+
+        user.IsDeactivated = false;
+
+        var result = await _userManager.UpdateAsync(user);
+
+        if(!result.Succeeded)
+            throw new InvalidOperationException(string.Join(", ", result.Errors.Select(e => e.Description)));
     }
 
-    public Task AssignRoleAsync(string userId, string roleName)
+    public async Task AssignRoleAsync(string userId, string roleName)
     {
-        throw new NotImplementedException();
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+            throw new KeyNotFoundException("User not found");
+
+        if (!await _roleManager.RoleExistsAsync(roleName))
+            throw new KeyNotFoundException("Role does not exist");
+
+        if (await _userManager.IsInRoleAsync(user, roleName))
+            return;
+
+        var result = await _userManager.AddToRoleAsync(user, roleName);
+
+        if (!result.Succeeded)
+            throw new InvalidOperationException(
+                string.Join(", ", result.Errors.Select(e => e.Description)));
     }
 
-    public Task DeactivateUserAsync(string userId)
+    public async Task DeactivateUserAsync(string userId)
     {
-        throw new NotImplementedException();
+        var user = await _userManager.FindByIdAsync(userId);
+
+        if (user == null)
+            throw new KeyNotFoundException("User not found");
+
+        user.IsDeactivated = true;
+
+        var result = await _userManager.UpdateAsync(user);
+
+        if (!result.Succeeded)
+            throw new InvalidOperationException(string.Join(", ", result.Errors.Select(e => e.Description)));
     }
 
-    public Task<List<IdentityRole>> GetAllRolesAsync()
+    public async Task<List<RoleResponse>> GetAllRolesAsync()
     {
-        throw new NotImplementedException();
+        var result = await _roleManager.Roles.ToListAsync();
+
+        if(result == null)
+            throw new KeyNotFoundException("No roles found");
+
+        return result.Select(RoleMapping.ToResponse).ToList();
     }
 
     public async Task<PagedResult<UserResponse>> GetUsersPagedAsync(PaginationParameters parameters, string? searchTerm = null)
@@ -43,18 +80,20 @@ public class UserManagementService : IUserManagementService
         return result.Map(UserMapping.ToResponse);
     }
 
-    public Task LockUserAsync(string userId)
+    public async Task RemoveRoleAsync(string userId, string roleName)
     {
-        throw new NotImplementedException();
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+            throw new KeyNotFoundException("User not found");
+
+        if (!await _userManager.IsInRoleAsync(user, roleName))
+            return;
+
+        var result = await _userManager.RemoveFromRoleAsync(user, roleName);
+
+        if (!result.Succeeded)
+            throw new InvalidOperationException(
+                string.Join(", ", result.Errors.Select(e => e.Description)));
     }
 
-    public Task RemoveRoleAsync(string userId, string roleName)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task UnlockUserAsync(string userId)
-    {
-        throw new NotImplementedException();
-    }
 }

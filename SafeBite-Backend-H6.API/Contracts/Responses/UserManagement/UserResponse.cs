@@ -7,7 +7,7 @@
         public string? UserName { get; set; }
         public bool IsActive { get; set; }
         public bool IsLocked { get; set; }
-        public List<UserRoleResponse> Roles { get; set; }
+        public List<RoleResponse> Roles { get; set; }
 
     }
 }
