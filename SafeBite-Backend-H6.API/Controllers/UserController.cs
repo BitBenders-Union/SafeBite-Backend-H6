@@ -36,7 +36,7 @@ public class UserController : ControllerBase
         return Ok(totalInactiveUserCount);
     }
 
-    [HttpPost("{id}/A ctivate")]
+    [HttpPost("{id}/Activate")]
     public async Task<IActionResult> ActivateUser(string id)
     {
         try
@@ -78,7 +78,7 @@ public class UserController : ControllerBase
 
     }
 
-    [HttpGet("/GetAllRoles")]
+    [HttpGet("UserManagement/GetAllRoles")]
     public async Task<IActionResult> GetAllRoles()
     {
         try
@@ -93,7 +93,7 @@ public class UserController : ControllerBase
         }
     }
 
-    [HttpPost("/SetRole")]
+    [HttpPost("UserManagement/SetRole")]
     public async Task<IActionResult> SetUserRole(AssignRoleRequest request)
     {
         try
@@ -111,7 +111,7 @@ public class UserController : ControllerBase
         }
     }
 
-    [HttpPost("/RemoveRole")]
+    [HttpPost("UserManagement/RemoveRole")]
     public async Task<IActionResult> RemoveUserRole(AssignRoleRequest request)
     {
         try
