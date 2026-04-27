@@ -1,15 +1,14 @@
 ﻿namespace SafeBite_Backend_H6.API.Mappings;
 
-public class CustomAllergyMappings
+public static class CustomAllergyMappings
 {
 
     public static CustomAllergyResponse ToResponse(CustomAllergy item)
     {
-        string allergyName = item.Name.Trim().ToLower();
         return new CustomAllergyResponse
         {
             Id = item.Id,
-            Name = allergyName.Length > 0 ? $"{char.ToUpper(allergyName[0])}{allergyName[1..]}" : allergyName
+            Name = item.Name
         };
     }
 
@@ -19,13 +18,14 @@ public class CustomAllergyMappings
         {
             Id = Guid.NewGuid(),
             UserId = userId,
-            Name = request.Name.Trim()
+            Name = StringHelpers.ToTitleCase(request.Name), 
+            NormalizedName = StringHelpers.NormalizeName(request.Name)
         };
     }
 
     public static void ToEntityFromUpdateRequest(CustomAllergyUpdateRequest request, CustomAllergy existingCustomAllergy)
     {
-        string allergyName = request.Name.Trim().ToLower();
-        existingCustomAllergy.Name = allergyName.Length > 0 ? $"{char.ToUpper(allergyName[0])}{allergyName[1..]}" : allergyName;
+        existingCustomAllergy.Name = StringHelpers.ToTitleCase(request.Name);
+        existingCustomAllergy.NormalizedName = StringHelpers.NormalizeName(request.Name);
     }
 }

@@ -79,5 +79,9 @@ public class AllergyUserService : IAllergyUserService
         return items;
     }
 
+    public async Task<int> GetTotalCountAsync()
+    {
+        return await _repository.CountAsync();
+    }
 
 }

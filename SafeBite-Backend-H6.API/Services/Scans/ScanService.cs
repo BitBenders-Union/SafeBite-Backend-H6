@@ -71,7 +71,7 @@ public class ScanService : IScanService
         if (createdScan is null)
             throw new KeyNotFoundException("Created scan could not be reloaded.");
 
-        return ScanMappings.ToResponse(createdScan);
+        return ScanMappings.ToScanResponse(createdScan);
     }
 
     //Standard Service Metoder
@@ -100,5 +100,10 @@ public class ScanService : IScanService
         bool deleted = await _scanRepository.DeleteAsync(scanId);
         if (deleted) await _scanRepository.SaveChangesAsync();
         return deleted;
+    }
+
+    public async Task<int> GetTotalCountAsync()
+    {
+        return await _scanRepository.CountAsync();
     }
 }

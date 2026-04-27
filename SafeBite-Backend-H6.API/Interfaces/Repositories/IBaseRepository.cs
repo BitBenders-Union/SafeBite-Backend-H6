@@ -9,4 +9,5 @@ public interface IBaseRepository<T> where T : class
     Task<bool> DeleteAsync(Guid id);
     Task<PagedResult<T>> GetPagedAsync(PaginationParameters parameters, IQueryable<T>? query = null);
     Task SaveChangesAsync();
+    Task<int> CountAsync();
 }
