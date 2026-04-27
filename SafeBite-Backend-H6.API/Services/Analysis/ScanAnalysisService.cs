@@ -1,4 +1,6 @@
-﻿namespace SafeBite_Backend_H6.API.Services.Analysis;
+﻿using SafeBite_Backend_H6.API.Utilities.Constants;
+
+namespace SafeBite_Backend_H6.API.Services.Analysis;
 
 public class ScanAnalysisService : IScanAnalysisService
 {

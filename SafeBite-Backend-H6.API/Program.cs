@@ -1,7 +1,3 @@
-using SafeBite_Backend_H6.API.Services.Scans;
-using SafeBiteApi.Services.Analysis;
-using SafeBiteApi.Utilities;
-
 var builder = WebApplication.CreateBuilder(args);
 
 

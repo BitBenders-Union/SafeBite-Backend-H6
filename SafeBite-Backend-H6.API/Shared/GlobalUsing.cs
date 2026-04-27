@@ -44,10 +44,11 @@ global using SafeBite_Backend_H6.API.Repositories;
 global using SafeBite_Backend_H6.API.Services.Allergies;
 global using SafeBite_Backend_H6.API.Services.Analysis;
 global using SafeBite_Backend_H6.API.Services.OCR;
-global using SafeBiteApi.Utilities.Constants;
-global using SafeBiteApi.Utilities;
 global using System.Text.Json;
 global using System.Text.Json.Serialization;
+global using SafeBite_Backend_H6.API.Services.Scans;
+global using SafeBite_Backend_H6.API.Utilities;
+global using SafeBite_Backend_H6.API.Utilities.Constants;
 
 global using System.Text.RegularExpressions;
 global using System.ComponentModel.DataAnnotations;
