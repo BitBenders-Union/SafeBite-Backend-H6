@@ -36,7 +36,15 @@ public class UserController : ControllerBase
         return Ok(totalInactiveUserCount);
     }
 
-    [HttpPost("{id}/Activate")]
+    [HttpGet]
+    public async Task<IActionResult> GetAllUsersWithRoles([FromQuery] PaginationParameters parameters, [FromQuery] string? searchTerm = null)
+    {
+        var usersWithRoles = await _userService.GetUsersPagedAsync(parameters, searchTerm);
+
+        return Ok(usersWithRoles);
+    }
+
+    [HttpPost("UserManagement/{id}/Activate")]
     public async Task<IActionResult> ActivateUser(string id)
     {
         try
@@ -57,7 +65,7 @@ public class UserController : ControllerBase
     }
 
 
-    [HttpPost("{id}/Deactivate")]
+    [HttpPost("UserManagement/{id}/Deactivate")]
     public async Task<IActionResult> DeActivateUser(string id)
     {
         try
