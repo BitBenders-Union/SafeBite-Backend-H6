@@ -137,6 +137,8 @@ jobs:
             -e Email__EnableSsl='true' \
             -e Seed__AdminEmail='${{ secrets.ADMIN_EMAIL }}' \
             -e Seed__AdminPassword='${{ secrets.ADMIN_PASS }}' \
+            -e User__UserId='${{ secrets.USER_ID }}' \
+            -e Allergy__PeanutAllergyId='${{ secrets.PNUT_ALGY_ID }}'
             --name "${container_name}" ghcr.io/${owner}/dev-safebite-api:${version}
 
             echo "Deployed"
