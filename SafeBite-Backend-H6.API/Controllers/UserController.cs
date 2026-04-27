@@ -44,7 +44,7 @@ public class UserController : ControllerBase
         return Ok(usersWithRoles);
     }
 
-    [HttpPost("{id}/Activate")]
+    [HttpPost("UserManagement/{id}/Activate")]
     public async Task<IActionResult> ActivateUser(string id)
     {
         try
@@ -65,7 +65,7 @@ public class UserController : ControllerBase
     }
 
 
-    [HttpPost("{id}/Deactivate")]
+    [HttpPost("UserManagement/{id}/Deactivate")]
     public async Task<IActionResult> DeActivateUser(string id)
     {
         try
