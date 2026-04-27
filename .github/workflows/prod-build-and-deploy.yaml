@@ -1,0 +1,144 @@
+name: Test, Build and Deploy Prod Backend
+
+on:
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+  checks: write
+  pull-requests: write
+  
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout repository. 
+        uses: actions/checkout@v4
+
+      #Runs Backend Unit-test
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0"
+
+      - name: Restore Dependencies
+        run: dotnet restore SafeBite-Backend-H6.slnx
+
+      - name: Build Soulation
+        run: dotnet build SafeBite-Backend-H6.slnx --configuration Release --no-restore
+
+      - name: Run XUnit test with reports.
+        working-directory: ./SafeBite-Backend-H6.Test/
+        run: |
+          dotnet test SafeBite-Backend-H6.Test.csproj \
+          --configuration Release \
+          --no-build --logger "trx;LogFileName=TestResults.trx" --results-directory "TestResults"
+
+      #Uploads test results artifact
+      - name: Upload test results artifact.
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Test Results
+          path: SafeBite-Backend-H6.Test/TestResults/*.trx
+          if-no-files-found: warn
+
+      - name: Publish Test Results Summary
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: SafeBite API XUnit Tests Results
+          path: SafeBite-Backend-H6.Test/TestResults/*.trx
+          reporter: dotnet-trx
+          fail-on-empty: false
+
+  #Runs Creates cointainer from Docker File and Pushes it to VPS
+  build-and-push:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout repository. 
+        uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_PAT }}
+
+      - name: Build Docker image using existing Dockerfile
+        working-directory: ./SafeBite-Backend-H6.API
+        run: |
+            owner=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+            version="prod-${{ github.event.release.tag_name || github.run_number }}"
+            echo "Building version: ${version}" 
+
+            # Use the Dockerfile from the current directory
+            
+            docker build -f Dockerfile \
+              -t ghcr.io/${owner}/prod-safebite-api:${version} \
+              -t ghcr.io/${owner}/prod-safebite-api:latest .
+
+      - name: Push Prod Container image to GitHub Container Registry
+        run: |
+              owner=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+              version="prod-${{ github.event.release.tag_name || github.run_number }}"
+              docker push ghcr.io/${owner}/prod-safebite-api:${version}
+              docker push ghcr.io/${owner}/prod-safebite-api:latest
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    environment: VPS_PROD
+
+    steps:
+      - name: SSH to VPS and deploy Prod API container
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: chimpchonkserver.duckdns.org
+          username: githubaction
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            owner=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+            version="prod-${{ github.event.release.tag_name || github.run_number }}"
+
+            # define a container name so docker run receives a valid --name argument
+            container_name="prod-safebite-api"
+
+            echo "Logging in to Docker registry..."
+            docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GHCR_PAT }}
+
+            echo "Pulling version ${version}..."
+            docker pull ghcr.io/${owner}/prod-safebite-api:${version}
+
+            echo "Stopping existing Prod container (if any)..."
+            docker ps -a --filter "name=${container_name}" --format "{{.ID}}" | xargs -r docker rm -f
+
+            echo "Running new Prod container with HTTPS enabled..."
+            docker run -d -p 8080:80 -p 8443:443 --network safebite-prod-network \
+            -v /etc/letsencrypt/live/chimpchonkserver.duckdns.org:/https:ro \
+            -e ConnectionStrings__AppConnection='${{ secrets.APP_DB }}' \
+            -e ConnectionStrings__AuthConnection='${{ secrets.AUTH_DB }}' \
+            -e ASPNETCORE_URLS='https://+;http://+' \
+            -e ASPNETCORE_HTTPS_PORT=443 \
+            -e ASPNETCORE_ENVIRONMENT=Development \
+            -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/safebite.pfx \
+            -e ASPNETCORE_Kestrel__Certificates__Default__Password='${{ secrets.SSL_PASS }}' \
+            -e OpenAI__ApiKey='${{ secrets.OPENAI_KEY }}' \
+            -e Email__From='${{ secrets.EMAIL_FROM }}' \
+            -e Email__Username='${{ secrets.EMAIL_USER }}' \
+            -e Email__Password='${{ secrets.EMAIL_PASS }}' \
+            -e Email__Host='${{ secrets.EMAIL_HOST }}' \
+            -e Email__Port='587' \
+            -e Email__EnableSsl='true' \
+            --name "${container_name}" ghcr.io/${owner}/prod-safebite-api:${version}
+
+            echo "Deployed"
