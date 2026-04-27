@@ -1,5 +1,5 @@
 ﻿using SafeBite_Backend_H6.API.Contracts.Requests.Analysis;
-using SafeBiteApi.Utilities.Constants;
+using SafeBite_Backend_H6.API.Utilities.Constants;
 
 
 namespace SafeBite_Backend_H6.Test.Utilities;
