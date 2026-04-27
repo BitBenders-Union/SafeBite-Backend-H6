@@ -36,7 +36,7 @@ public class UserController : ControllerBase
         return Ok(totalInactiveUserCount);
     }
 
-    [HttpGet]
+    [HttpGet("UserManagement/GetAllUsersWithRoles")]
     public async Task<IActionResult> GetAllUsersWithRoles([FromQuery] PaginationParameters parameters, [FromQuery] string? searchTerm = null)
     {
         var usersWithRoles = await _userService.GetUsersPagedAsync(parameters, searchTerm);
