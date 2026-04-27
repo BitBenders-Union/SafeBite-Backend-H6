@@ -60,7 +60,7 @@ public class ScanService : IScanService
         _allergyMatcher.MergeResults(analysisResult, localMatches);
 
         // 7. Gem i databasen
-        Scan scan = ScanMappings.ToEntity(userId, request.Name, analysisResult);
+        Scan scan = ScanMappings.ToScanEntity(userId, request.Name, analysisResult);
 
         await _scanRepository.AddAsync(scan);
         await _scanRepository.SaveChangesAsync();
@@ -81,14 +81,14 @@ public class ScanService : IScanService
         ArgumentNullException.ThrowIfNull(userId);
         var query = _scanRepository.QueryByUserId(userId, searchTerm, hasDetectedAllergies);
         PagedResult<Scan> result = await _scanRepository.GetPagedAsync(parameters, query);
-        return result.Map(ScanMappings.ToResponse);
+        return result.Map(ScanMappings.ToScanResponse);
     }
 
     public async Task<ScanResponse?> GetByIdAsync(string userId, Guid scanId)
     {
         ArgumentNullException.ThrowIfNull(userId);
         var scan = await _scanRepository.GetFullScanByIdAsync(scanId, userId);
-        return scan is null ? null : ScanMappings.ToResponse(scan);
+        return scan is null ? null : ScanMappings.ToScanResponse(scan);
     }
 
     public async Task<bool> DeleteAsync(string userId, Guid scanId)
