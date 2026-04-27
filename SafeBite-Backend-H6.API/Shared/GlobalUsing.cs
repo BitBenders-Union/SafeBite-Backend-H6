@@ -14,6 +14,8 @@ global using Microsoft.AspNetCore.WebUtilities;
 global using Microsoft.Extensions.Options;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.AspNetCore.Authorization;
+global using Microsoft.AspNetCore.RateLimiting;
+global using System.Threading.RateLimiting;
 
 global using SafeBite_Backend_H6.API.Entities.Scans;
 global using SafeBite_Backend_H6.API.Entities.Allergies;
@@ -48,7 +50,17 @@ global using SafeBiteApi.Utilities.Constants;
 global using SafeBiteApi.Utilities;
 global using System.Text.Json;
 global using System.Text.Json.Serialization;
+global using SafeBite_Backend_H6.API.Interfaces.Services.Users;
+global using SafeBite_Backend_H6.API.Services.Scans;
+global using SafeBite_Backend_H6.API.Services.Users;
+global using SafeBiteV2.API.Contracts.Responses.UserManagement;
+global using SafeBite_Backend_H6.API.Contracts.Responses.UserManagement;
+global using SafeBite_Backend_H6.API.Contracts.Requests.Role;
 
+
+global using SafeBite_Backend_H6.API.Utilities;
+
+global using System.Globalization;
 global using System.Text.RegularExpressions;
 global using System.ComponentModel.DataAnnotations;
 global using System.Diagnostics;

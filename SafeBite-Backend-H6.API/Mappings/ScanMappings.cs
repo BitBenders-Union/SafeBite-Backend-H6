@@ -1,35 +1,35 @@
 ﻿namespace SafeBite_Backend_H6.API.Mappings;
 
-public class ScanMappings
+public static class ScanMappings
 {
-    public static Scan ToEntity(string userId, string? name, ScanAnalysisResult analysisResult)
+    public static Scan ToScanEntity(string userId, string? name, ScanAnalysisResult analysisResult)
     {
         return new Scan
         {
             Id = Guid.NewGuid(),
             UserId = userId,
-            Name = string.IsNullOrWhiteSpace(name) ? null : name.Trim(),
+            Name = !string.IsNullOrWhiteSpace(name) ? StringHelpers.ToTitleCase(name) : null,
             ScannedAt = DateTime.UtcNow,
             DetectedAllergies = analysisResult.DetectedAllergies
-                .Select(ToEntity)
+                .Select(ToScanDetectedAllergyEntity)
                 .ToList()
         };
     }
 
-    public static ScanDetectedAllergies ToEntity(DetectedAllergyAnalysisResult item)
+    public static ScanDetectedAllergies ToScanDetectedAllergyEntity(DetectedAllergyAnalysisResult item)
     {
         return new ScanDetectedAllergies
         {
             Id = Guid.NewGuid(),
             AllergyId = item.AllergyId,
             MatchedIngredients = item.MatchedIngredients
-                .Where(x => !string.IsNullOrWhiteSpace(x))
-                .Select(ToEntity)
+                .Where(mi => !string.IsNullOrWhiteSpace(mi))
+                .Select(ToDetectedIngredientMatchEntity)
                 .ToList()
         };
     }
 
-    public static DetectedIngredientMatch ToEntity(string ingredientText)
+    public static DetectedIngredientMatch ToDetectedIngredientMatchEntity(string ingredientText)
     {
         return new DetectedIngredientMatch
         {
@@ -38,7 +38,7 @@ public class ScanMappings
         };
     }
 
-    public static ScanResponse ToResponse(Scan scan)
+    public static ScanResponse ToScanResponse(Scan scan)
     {
         return new ScanResponse
         {
@@ -47,12 +47,12 @@ public class ScanMappings
             Name = scan.Name,
             ScannedAt = scan.ScannedAt,
             DetectedAllergies = scan.DetectedAllergies
-                .Select(ToResponse)
+                .Select(ToScanDetectedAllergyResponse)
                 .ToList()
         };
     }
 
-    public static ScanDetectedAllergyResponse ToResponse(ScanDetectedAllergies item)
+    public static ScanDetectedAllergyResponse ToScanDetectedAllergyResponse(ScanDetectedAllergies item)
     {
         return new ScanDetectedAllergyResponse
         {
@@ -60,12 +60,12 @@ public class ScanMappings
             AllergyId = item.AllergyId,
             AllergyName = item.Allergy?.Name ?? string.Empty,
             MatchedIngredients = item.MatchedIngredients
-                .Select(ToResponse)
+                .Select(ToDetectedIngredientMatchResponse)
                 .ToList()
         };
     }
 
-    public static DetectedIngredientMatchResponse ToResponse(DetectedIngredientMatch item)
+    public static DetectedIngredientMatchResponse ToDetectedIngredientMatchResponse(DetectedIngredientMatch item)
     {
         return new DetectedIngredientMatchResponse
         {

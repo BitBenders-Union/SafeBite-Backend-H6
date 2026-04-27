@@ -12,17 +12,17 @@ public class CustomAllergyRepository : BaseRepository<CustomAllergy>, ICustomAll
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
-            query = query.Where(a => a.Name.Contains(searchTerm.Trim()));
+            query = query.Where(a => a.NormalizedName.Contains(StringHelpers.NormalizeName(searchTerm)));
         }
 
-        return query.OrderBy(a => a.Name);
+        return query.OrderBy(a => a.NormalizedName);
     }
 
     public async Task<CustomAllergy?> GetAllergyByNameAsync(string name)
     {
         return await _context.CustomAllergies
             .AsNoTracking()
-            .FirstOrDefaultAsync(a => a.Name.ToLower().Trim() == name.ToLower().Trim());
+            .FirstOrDefaultAsync(a => a.NormalizedName == StringHelpers.NormalizeName(name));
     }
 
     public async Task<bool> DeleteAsync(Guid customAllergyId, string userId)

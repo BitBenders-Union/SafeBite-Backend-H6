@@ -1,4 +1,6 @@
-﻿namespace SafeBite_Backend_H6.API.Controllers;
+﻿using SafeBite_Backend_H6.API.Services.Scans;
+
+namespace SafeBite_Backend_H6.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -77,5 +79,13 @@ public class CustomAllergyController : ControllerBase
         {
             return NotFound(ex.Message);
         }
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpGet("total-count")]
+    public async Task<IActionResult> GetTotalCount()
+    {
+        var totalCount = await _customAllergyService.GetTotalCountAsync();
+        return Ok(new { TotalCustomAllergyCount = totalCount });
     }
 }

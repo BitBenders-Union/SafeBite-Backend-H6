@@ -8,4 +8,5 @@ public interface IAllergyService
     Task<AllergyResponse> AddAllergyAsync(AllergyRequest allergyRequest);
     Task UpdateAllergy(AllergyUpdateRequest allergyRq);
     Task<bool> DeleteAllergyAsync(Guid id);
+    Task<int> GetTotalCountAsync();
 }
