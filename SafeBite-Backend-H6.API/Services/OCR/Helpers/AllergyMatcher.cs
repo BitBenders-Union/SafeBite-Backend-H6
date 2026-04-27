@@ -1,4 +1,4 @@
-﻿namespace SafeBiteApi.Utilities;
+﻿namespace SafeBite_Backend_H6.API.Utilities;
 
 public class AllergyMatcher : IAllergyMatcher
 {

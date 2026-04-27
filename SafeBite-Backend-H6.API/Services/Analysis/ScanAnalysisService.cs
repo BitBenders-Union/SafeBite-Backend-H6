@@ -1,9 +1,4 @@
-﻿using OpenAI.Chat;
-using SafeBiteApi.Utilities.Constants;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-
-namespace SafeBiteApi.Services.Analysis;
+﻿namespace SafeBite_Backend_H6.API.Services.Analysis;
 
 public class ScanAnalysisService : IScanAnalysisService
 {

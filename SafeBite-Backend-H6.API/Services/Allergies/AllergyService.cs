@@ -1,4 +1,6 @@
-﻿namespace SafeBite_Backend_H6.API.Services.Allergies;
+﻿using AllergyMappings = SafeBite_Backend_H6.API.Mappings.AllergyMappings;
+
+namespace SafeBite_Backend_H6.API.Services.Allergies;
 
 public class AllergyService : IAllergyService
 {

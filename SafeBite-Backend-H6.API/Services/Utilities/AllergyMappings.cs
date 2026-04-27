@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace SafeBiteApi.Utilities
+﻿namespace SafeBite_Backend_H6.API.Utilities
 {
     public static class AllergyMappings
     {

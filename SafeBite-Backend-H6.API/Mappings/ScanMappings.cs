@@ -1,6 +1,4 @@
-﻿
-
-namespace SafeBite_Backend_H6.API.Mappings;
+﻿namespace SafeBite_Backend_H6.API.Mappings;
 
 public class ScanMappings
 {

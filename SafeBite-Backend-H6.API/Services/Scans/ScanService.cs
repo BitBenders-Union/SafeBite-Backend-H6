@@ -1,10 +1,4 @@
-﻿using SafeBite_Backend_H6.API.Interfaces.Services.OCR;
-using SafeBite_Backend_H6.API.Repositories;
-using SafeBite_Backend_H6.API.Shared;
-using SafeBite_Backend_H6.API.Mappings;
-using SafeBiteApi.Utilities;
-
-namespace SafeBite_Backend_H6.API.Services.Scans;
+﻿namespace SafeBite_Backend_H6.API.Services.Scans;
 
 public class ScanService : IScanService
 {

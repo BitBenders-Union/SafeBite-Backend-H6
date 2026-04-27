@@ -1,8 +1,4 @@
-﻿
-
-using SafeBiteApi.Utilities.Constants;
-
-namespace SafeBiteApi.Services.OCR.Engines;
+﻿namespace SafeBiteApi.Services.OCR.Engines;
 
 public class AiExtractor : IAiExtractor
 {
