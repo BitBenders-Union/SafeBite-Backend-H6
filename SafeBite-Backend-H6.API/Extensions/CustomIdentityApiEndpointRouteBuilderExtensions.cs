@@ -4,6 +4,8 @@ namespace SafeBite_Backend_H6.API.Extensions;
 
 
 // kopiret fra identity's github repo. gjort for at customize forskellige dele bla. registrering.
+// https://stackoverflow.com/questions/77765859/how-to-customize-net-8-identity-routes-mapidentityapi
+// https://github.com/dotnet/aspnetcore/blob/main/src/Identity/Core/src/IdentityApiEndpointRouteBuilderExtensions.cs
 
 
 

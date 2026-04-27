@@ -21,6 +21,8 @@ public class GetPagedScanBenchmark
     private AppDbContext _dbContext = null!;
     private IScanService _scanService = null!;
 
+    private string UserId = "";
+
     [GlobalSetup]
     public void GlobalSetup()
     {
@@ -31,6 +33,10 @@ public class GetPagedScanBenchmark
 
         var connectionString = config["ConnectionStrings:AppConnection"]
             ?? throw new InvalidOperationException("Connection string 'AppConnection' was not found.");
+
+        UserId = config["User:UserId"]
+            ?? throw new InvalidOperationException("Id string 'UserId' was not found");
+
 
         var options = new DbContextOptionsBuilder<AppDbContext>()
             .UseNpgsql(connectionString)
@@ -43,12 +49,15 @@ public class GetPagedScanBenchmark
         var ocrService = new FakeGetOcrService();
         var userAllergyService = new FakeGetUserAllergyAnalysisService();
         var scanAnalysisService = new FakeGetScanAnalysisService();
+        var allergyMatcher = new FakeAllergyMatcher();
 
         _scanService = new ScanService(
             repository,
             ocrService,
             userAllergyService,
-            scanAnalysisService
+            scanAnalysisService,
+            allergyMatcher
+
         );
     }
 
@@ -64,7 +73,6 @@ public class GetPagedScanBenchmark
     [Params("", "s", "soy")]
     public string? SearchTerm { get; set; }
 
-    private const string UserId = "f9e29bed-095e-4cb4-aec8-8d69acf528b0";
 
 
     [Benchmark]
@@ -101,6 +109,24 @@ public class GetPagedScanBenchmark
         public Task<ScanAnalysisResult> AnalyzeIngredientsAsync(ScanAnalysisRequest request)
         {
             throw new NotImplementedException("ScanAnalysisService Should not be called!");
+        }
+    }
+
+    private sealed class FakeAllergyMatcher : IAllergyMatcher
+    {
+        public List<DetectedAllergyAnalysisResult> MatchAllergies(string ingredientsText, List<AllergyAnalysisItem> userAllergies)
+        {
+            throw new NotImplementedException("AllergyMatcher should not be called!");
+        }
+
+        public List<DetectedAllergyAnalysisResult> MatchLocalAllergies(string text, List<AllergyAnalysisItem> allergies)
+        {
+            throw new NotImplementedException("Local Allergy Matcher should not be called!");
+        }
+
+        public void MergeResults(ScanAnalysisResult ai, List<DetectedAllergyAnalysisResult> local)
+        {
+            throw new NotImplementedException("MergeResults should not be called!");
         }
     }
 

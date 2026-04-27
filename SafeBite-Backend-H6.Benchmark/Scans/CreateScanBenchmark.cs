@@ -24,10 +24,8 @@ public class CreateScanBenchmark
     private IScanService _scanService = null!;
     private IFormFile _imageFile = null!;
 
-    private static readonly Guid PeanutAllergyId =
-            Guid.Parse("019dab0c-d468-71e9-8f4e-69c7c8f2266b");
-
-    private const string UserId = "f9e29bed-095e-4cb4-aec8-8d69acf528b0";
+    private static Guid PeanutAllergyId;
+    private string UserId;
 
     [Params("Benchmark scan")]
     public string Name { get; set; } = null!;
@@ -48,6 +46,14 @@ public class CreateScanBenchmark
         var connectionString = config["ConnectionStrings:AppConnection"]
             ?? throw new InvalidOperationException("Connection string 'AppConnection' was not found.");
 
+        UserId = config["User:UserId"]
+            ?? throw new InvalidOperationException("Id string 'UserId' was not found");
+
+        var peanutId = config["Allergy:PeanutAllergyId"]
+            ?? throw new InvalidOperationException("PeanutAllergyId missing");
+
+        PeanutAllergyId = Guid.Parse(peanutId);
+
         var options = new DbContextOptionsBuilder<AppDbContext>()
             .UseNpgsql(connectionString)
             .Options;
@@ -59,12 +65,14 @@ public class CreateScanBenchmark
         var ocrService = new FakeCreateOcrService();
         var userAllergyService = new FakeCreateUserAllergyAnalysisService();
         var scanAnalysisService = new FakeCreateScanAnalysisService();
+        var allergyMatcher = new FakeAllergyMatcher();
 
         _scanService = new ScanService(
             repository,
             ocrService,
             userAllergyService,
-            scanAnalysisService
+            scanAnalysisService,
+            allergyMatcher
         );
         _imageFile = CreateFakeImageFile();
     }
@@ -142,8 +150,60 @@ public class CreateScanBenchmark
         }
     }
 
+    private sealed class FakeAllergyMatcher : IAllergyMatcher
+    {
+        public List<DetectedAllergyAnalysisResult> MatchAllergies(string ingredientsText, List<AllergyAnalysisItem> userAllergies)
+        {
+            return new List<DetectedAllergyAnalysisResult>
+            {
+                new DetectedAllergyAnalysisResult
+                {
+                    AllergyId = PeanutAllergyId,
+                    AllergyName = "Peanut",
+                    MatchedIngredients = new List<string> { "Peanut" }
+                }
 
-    [GlobalCleanup]
+            };
+        }
+
+        public List<DetectedAllergyAnalysisResult> MatchLocalAllergies(string text, List<AllergyAnalysisItem> allergies)
+        {
+            return new List<DetectedAllergyAnalysisResult>
+            {
+                new DetectedAllergyAnalysisResult
+                {
+                    AllergyId = PeanutAllergyId,
+                    AllergyName = text,
+                    MatchedIngredients = new List<string> { "Peanut" }
+                }
+            };
+        }
+
+        public void MergeResults(ScanAnalysisResult ai, List<DetectedAllergyAnalysisResult> local)
+        {
+            // we use the analysis result after this method is called therefore we need to ensure this variable is correct
+
+            local = local ?? new List<DetectedAllergyAnalysisResult>
+            {
+                    new DetectedAllergyAnalysisResult
+                    {
+                        AllergyId = PeanutAllergyId,
+                        AllergyName = "Peanut",
+                        MatchedIngredients =new List<string> {
+                            "Peanut"
+                        },
+                    }
+            };
+
+            ai = new ScanAnalysisResult
+            {
+                IngredientsText = ai.IngredientsText,
+                DetectedAllergies = local
+            };
+        }
+    }
+
+        [GlobalCleanup]
     public void GlobalCleanup()
     {
         _dbContext.Dispose();
