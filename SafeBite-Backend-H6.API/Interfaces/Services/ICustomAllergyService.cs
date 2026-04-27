@@ -7,4 +7,5 @@ public interface ICustomAllergyService
     Task<PagedResult<CustomAllergyResponse>> GetCustomAllergiesPagedAsync(string userId, PaginationParameters parameters, string? searchTerm = null);
     Task UpdateCustomAllergyAsync(CustomAllergyUpdateRequest customAllergyUpdateRequest, string userId);
     Task<List<AllergyAnalysisItem>> GetAnalysisItemsByUserIdAsync(string userId);
+    Task<int> GetTotalCountAsync();
 }
