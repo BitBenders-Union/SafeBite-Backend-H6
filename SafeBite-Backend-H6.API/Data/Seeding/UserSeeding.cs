@@ -30,14 +30,18 @@ public class UserSeeding
 
             if (!result.Succeeded)
             {
-                var errors = string.Join(", ", result.Errors.Select(x => x.Description));
-                throw new Exception($"Failed to create admin user: {errors}");
+                throw new Exception($"Failed to create admin user: {result.Errors.Select(x => x.Description)}");
             }
         }
 
-        if (!await userManager.IsInRoleAsync(admin, "Admin"))
+        if (!await userManager.IsInRoleAsync(admin, Roles.Admin))
         {
-            await userManager.AddToRoleAsync(admin, "Admin");
+            await userManager.AddToRoleAsync(admin, Roles.Admin);
+        }
+
+        if(!await userManager.IsInRoleAsync(admin, Roles.User))
+        {
+            await userManager.AddToRoleAsync(admin, Roles.User);
         }
     }
 }
