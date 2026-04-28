@@ -99,24 +99,4 @@ public class ScanAnalysisService : IScanAnalysisService
     private ScanAnalysisResult CreateEmptyResult(ScanAnalysisRequest request) =>
         new() { IngredientsText = request.IngredientsText.Trim(), DetectedAllergies = [] };
 
-    private sealed class ScanAnalysisAiResponse
-    {
-        [JsonPropertyName("ingredients_text")]
-        public string? IngredientsText { get; set; }
-
-        [JsonPropertyName("detected_allergies")]
-        public List<DetectedAllergyAiItem>? DetectedAllergies { get; set; }
-    }
-
-    private sealed class DetectedAllergyAiItem
-    {
-        [JsonPropertyName("allergy_id")]
-        public string? AllergyId { get; set; }
-
-        [JsonPropertyName("allergy_name")]
-        public string? AllergyName { get; set; }
-
-        [JsonPropertyName("matched_ingredients")]
-        public List<string>? MatchedIngredients { get; set; }
-    }
 }

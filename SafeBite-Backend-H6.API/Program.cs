@@ -1,4 +1,13 @@
+
+
 var builder = WebApplication.CreateBuilder(args);
+
+
+// also load secrests in loadtest environment. standard is it only loads in development - this is made behind the scenes.
+if (builder.Environment.IsDevelopment() || builder.Environment.IsEnvironment("LoadTest"))
+{
+    builder.Configuration.AddUserSecrets<Program>();
+}
 
 
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -85,7 +94,6 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddScoped<IImageProcessor, ImageProcessor>();
 builder.Services.AddScoped<IAiExtractor, AiExtractor>();
-builder.Services.AddScoped<IOcrService, OcrService>();
 
 builder.Services.AddScoped<IAllergyService, AllergyService>();
 builder.Services.AddScoped<IAllergyUserService, AllergyUserService>();
@@ -101,10 +109,21 @@ builder.Services.AddScoped<IUserAllergyAnalysisService, UserAllergyAnalysisServi
 
 builder.Services.AddScoped<IScanRepository, ScanRepository>();
 builder.Services.AddScoped<IScanService, ScanService>();
-builder.Services.AddScoped<IScanAnalysisService, ScanAnalysisService>();
 builder.Services.AddScoped<IAllergyMatcher, AllergyMatcher>();
 
 builder.Services.AddTransient<IEmailSender, EmailSender>();
+
+
+if(builder.Environment.IsEnvironment("LoadTest"))
+{
+    builder.Services.AddScoped<IOcrService, FakeOcrService>();
+    builder.Services.AddScoped<IScanAnalysisService, FakeScanAnalysisService>();
+}
+else
+{
+    builder.Services.AddScoped<IOcrService, OcrService>();
+    builder.Services.AddScoped<IScanAnalysisService, ScanAnalysisService>();
+}
 
 
 # endregion
@@ -140,7 +159,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || builder.Environment.IsEnvironment("LoadTest"))
 {
     app.MapOpenApi();
 
@@ -164,7 +183,10 @@ app.UseAuthorization();
 
 app.UseCors("AllowAllOrigins");
 
-app.UseRateLimiter();
+if (!builder.Environment.IsEnvironment("LoadTest"))
+{
+    app.UseRateLimiter();
+}
 
 app.MapControllers();
 app.MapGroup("/auth").MapCustomIdentityApi<ApplicationUser>();

@@ -46,20 +46,17 @@ global using SafeBite_Backend_H6.API.Repositories;
 global using SafeBite_Backend_H6.API.Services.Allergies;
 global using SafeBite_Backend_H6.API.Services.Analysis;
 global using SafeBite_Backend_H6.API.Services.OCR;
-global using System.Text.Json;
-global using System.Text.Json.Serialization;
+
 global using SafeBite_Backend_H6.API.Services.Scans;
 global using SafeBite_Backend_H6.API.Utilities;
 global using SafeBite_Backend_H6.API.Utilities.Constants;
 global using SafeBite_Backend_H6.API.Interfaces.Services.Users;
-global using SafeBite_Backend_H6.API.Services.Scans;
 global using SafeBite_Backend_H6.API.Services.Users;
 global using SafeBiteV2.API.Contracts.Responses.UserManagement;
 global using SafeBite_Backend_H6.API.Contracts.Responses.UserManagement;
 global using SafeBite_Backend_H6.API.Contracts.Requests.Role;
-
-
-global using SafeBite_Backend_H6.API.Utilities;
+global using SafeBite_Backend_H6.API.Contracts.AiAnalysisDTOs;
+global using SafeBite_Backend_H6.API.FakeServices;
 
 global using System.Globalization;
 global using System.Text.RegularExpressions;
@@ -70,6 +67,8 @@ global using System.Text;
 global using System.Text.Encodings.Web;
 global using System.Net;
 global using System.Net.Mail;
+global using System.Text.Json;
+global using System.Text.Json.Serialization;
 
 global using OpenAI.Chat;
 global using Scalar.AspNetCore;
