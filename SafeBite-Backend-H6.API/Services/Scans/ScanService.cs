@@ -71,7 +71,7 @@ public class ScanService : IScanService
         if (createdScan is null)
             throw new KeyNotFoundException("Created scan could not be reloaded.");
 
-        return ScanMappings.ToResponse(createdScan);
+        return ScanMappings.ToScanResponse(createdScan);
     }
 
     //Standard Service Metoder
@@ -81,14 +81,14 @@ public class ScanService : IScanService
         ArgumentNullException.ThrowIfNull(userId);
         var query = _scanRepository.QueryByUserId(userId, searchTerm, hasDetectedAllergies);
         PagedResult<Scan> result = await _scanRepository.GetPagedAsync(parameters, query);
-        return result.Map(ScanMappings.ToResponse);
+        return result.Map(ScanMappings.ToScanResponse);
     }
 
     public async Task<ScanResponse?> GetByIdAsync(string userId, Guid scanId)
     {
         ArgumentNullException.ThrowIfNull(userId);
         var scan = await _scanRepository.GetFullScanByIdAsync(scanId, userId);
-        return scan is null ? null : ScanMappings.ToResponse(scan);
+        return scan is null ? null : ScanMappings.ToScanResponse(scan);
     }
 
     public async Task<bool> DeleteAsync(string userId, Guid scanId)
@@ -100,5 +100,10 @@ public class ScanService : IScanService
         bool deleted = await _scanRepository.DeleteAsync(scanId);
         if (deleted) await _scanRepository.SaveChangesAsync();
         return deleted;
+    }
+
+    public async Task<int> GetTotalCountAsync()
+    {
+        return await _scanRepository.CountAsync();
     }
 }

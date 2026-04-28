@@ -32,7 +32,7 @@ public class AllergyService : IAllergyService
         if (name.Trim() == string.Empty)
             throw new ArgumentException("name cannot be empty.");
 
-        Allergy? allergy = await _repository.GetAllergyByNameAsync(name);
+        Allergy? allergy = await _repository.GetAllergyByNameAsync(name.Trim());
 
         if (allergy == null)
             return null;
@@ -112,6 +112,11 @@ public class AllergyService : IAllergyService
             await _repository.SaveChangesAsync();
 
         return deleted;
+    }
+
+    public async Task<int> GetTotalCountAsync()
+    {
+        return await _repository.CountAsync();
     }
 
 

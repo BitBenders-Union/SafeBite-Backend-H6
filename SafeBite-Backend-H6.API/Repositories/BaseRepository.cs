@@ -66,12 +66,12 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class
     // derfor kalder vi blot en metode til at få vores query og så bruger vi det til denne metode
     public async Task<PagedResult<T>> GetPagedAsync(PaginationParameters parameters, IQueryable<T>? query = null)
     {
-        var source = query ?? _context.Set<T>()
+        var entity = query ?? _context.Set<T>()
             .AsNoTracking(); // vi laver ikke ændringer så vi behøver ikke at tracke, det gør det hurtigere og mindre ressourcekrævende
 
-        var totalCount = await source.CountAsync();
+        var totalCount = await entity.CountAsync();
 
-        var data = await source
+        var data = await entity
             .Skip((parameters.Page - 1) * parameters.PageSize)
             .Take(parameters.PageSize)
             .ToListAsync();
@@ -85,5 +85,13 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class
             Data = data
         };
     }
+
+    public async Task<int> CountAsync()
+    {
+        return await _context.Set<T>()
+            .AsNoTracking()
+            .CountAsync();
+    }
+
 }
 

@@ -4,6 +4,8 @@ namespace SafeBite_Backend_H6.API.Extensions;
 
 
 // kopiret fra identity's github repo. gjort for at customize forskellige dele bla. registrering.
+// https://stackoverflow.com/questions/77765859/how-to-customize-net-8-identity-routes-mapidentityapi
+// https://github.com/dotnet/aspnetcore/blob/main/src/Identity/Core/src/IdentityApiEndpointRouteBuilderExtensions.cs
 
 
 
@@ -258,7 +260,11 @@ public static class CustomIdentityApiEndpointRouteBuilderExtensions
                 return TypedResults.NotFound();
             }
 
-            return TypedResults.Ok(await CreateInfoResponseAsync(user, userManager));
+            if (user is not ApplicationUser appUser)
+            {
+                return TypedResults.NotFound();
+            }
+            return TypedResults.Ok(await CustomInfoMappings.ToResponseAsync(user as ApplicationUser, userManager as UserManager<ApplicationUser>));
         });
 
         accountGroup.MapPost("/info", async Task<Results<Ok<CustomInfoResponse>, ValidationProblem, NotFound>>
@@ -299,8 +305,11 @@ public static class CustomIdentityApiEndpointRouteBuilderExtensions
                     await SendConfirmationEmailAsync(user, userManager, context, infoRequest.NewEmail, isChange: true);
                 }
             }
-
-            return TypedResults.Ok(await CreateInfoResponseAsync(user, userManager));
+            if (user is not ApplicationUser appUser)
+            {
+                return TypedResults.NotFound();
+            }
+            return TypedResults.Ok(await CustomInfoMappings.ToResponseAsync(user as ApplicationUser, userManager as UserManager<ApplicationUser>));
         });
 
         // eget endpoint til deleteUser
@@ -315,6 +324,26 @@ public static class CustomIdentityApiEndpointRouteBuilderExtensions
                 return Results.NotFound();
 
             var result = await userManager.DeleteAsync(appUser);
+
+            if (!result.Succeeded)
+                return Results.BadRequest(result.Errors);
+
+            return Results.Ok();
+        });
+
+        accountGroup.MapPatch("/deactivateUser", async (
+            ClaimsPrincipal user,
+            UserManager<ApplicationUser> userManager) =>
+        {
+            var appUser = await userManager.GetUserAsync(user);
+
+            if (appUser == null)
+                return Results.NotFound();
+
+            appUser.IsDeactivated = true;
+            appUser.DeactivatedTime = DateTime.UtcNow;
+
+            var result =await userManager.UpdateAsync(appUser);
 
             if (!result.Succeeded)
                 return Results.BadRequest(result.Errors);
@@ -389,18 +418,12 @@ public static class CustomIdentityApiEndpointRouteBuilderExtensions
         return TypedResults.ValidationProblem(errorDictionary);
     }
 
-    private static async Task<CustomInfoResponse> CreateInfoResponseAsync<TUser>(TUser user, UserManager<TUser> userManager)
-        where TUser : class
-    {
-        return new()
-        {
-            UserId = await userManager.GetUserIdAsync(user) ?? throw new NotSupportedException("Unkown error: UserId not found!"),
-            Roles = await userManager.GetRolesAsync(user),
-            Email = await userManager.GetEmailAsync(user) ?? throw new NotSupportedException("Users must have an email."),
-            IsEmailConfirmed = await userManager.IsEmailConfirmedAsync(user),
+    //private static async Task<CustomInfoResponse> CreateInfoResponseAsync<TUser>(TUser user, UserManager<TUser> userManager)
+    //    where TUser : class
+    //{
+    //    return await CustomInfoMappings.ToResponseAsync(user as ApplicationUser, userManager as UserManager<ApplicationUser>);
 
-        };
-    }
+    //}
 
     // Wrap RouteGroupBuilder with a non-public type to avoid a potential future behavioral breaking change.
     private sealed class IdentityEndpointsConventionBuilder(RouteGroupBuilder inner) : IEndpointConventionBuilder

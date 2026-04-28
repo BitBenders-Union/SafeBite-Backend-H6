@@ -19,13 +19,12 @@ public class ScanRepository : BaseRepository<Scan>, IScanRepository
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
+            // we only search for allergies. this can also be changed into searching for the scan name.
+            // this is to make the query faster, instead of searching for both name, allergyname, ingredientname.
             var trimmed = searchTerm.Trim();
 
             query = query.Where(s =>
-                (s.Name != null && s.Name.Contains(trimmed)) ||
-                s.DetectedAllergies.Any(da =>
-                    da.Allergy.Name.Contains(trimmed) ||
-                    da.MatchedIngredients.Any(mi => mi.IngredientText.Contains(trimmed))));
+                s.DetectedAllergies.Any(da => da.Allergy.Name.Contains(trimmed)));
         }
 
         if (hasDetectedAllergies.HasValue)

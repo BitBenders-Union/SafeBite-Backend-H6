@@ -12,6 +12,7 @@ public class ScanController : ControllerBase
         _scanService = scanService;
     }
 
+    [EnableRateLimiting(RateLimitPolicyNames.Scan)]
     [HttpPost]
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> Create([FromForm] CreateScanRequest request)
@@ -57,5 +58,13 @@ public class ScanController : ControllerBase
             return NotFound();
 
         return NoContent();
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpGet("total-count")]
+    public async Task<IActionResult> GetTotalCount()
+    {
+        var totalCount = await _scanService.GetTotalCountAsync();
+        return Ok(new { TotalScanCount = totalCount });
     }
 }

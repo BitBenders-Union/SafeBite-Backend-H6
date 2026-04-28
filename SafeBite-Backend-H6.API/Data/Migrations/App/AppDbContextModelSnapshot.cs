@@ -37,9 +37,14 @@ namespace SafeBite_Backend_H6.API.Data.Migrations.App
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<string>("NormalizedName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("Name")
+                    b.HasIndex("NormalizedName")
                         .IsUnique();
 
                     b.ToTable("Allergies");
@@ -73,13 +78,18 @@ namespace SafeBite_Backend_H6.API.Data.Migrations.App
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<string>("NormalizedName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId", "Name")
+                    b.HasIndex("UserId", "NormalizedName")
                         .IsUnique();
 
                     b.ToTable("CustomAllergies");
