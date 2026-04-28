@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="SafeBite-Backend-H6.API/SafeBite-Backend-H6.API.csproj" />
   <Project Path="SafeBite-Backend-H6.Benchmark/SafeBite-Backend-H6.Benchmark.csproj" Id="7d356163-e6a4-445e-a41a-75861d5cb20a" />
+  <Project Path="SafeBite-Backend-H6.Load/SafeBite-Backend-H6.Load.csproj" />
   <Project Path="SafeBite-Backend-H6.Test/SafeBite-Backend-H6.Test.csproj" Id="79924e35-e676-4947-ab85-dccb1f30dc61" />
 </Solution>
