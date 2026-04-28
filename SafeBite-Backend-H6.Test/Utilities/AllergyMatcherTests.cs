@@ -1,6 +1,6 @@
 ﻿using SafeBite_Backend_H6.API.Contracts.Requests.Analysis;
 using SafeBite_Backend_H6.API.Contracts.Responses.Analysis;
-using SafeBiteApi.Utilities;
+using SafeBite_Backend_H6.API.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Text;

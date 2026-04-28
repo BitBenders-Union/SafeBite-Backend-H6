@@ -2,7 +2,7 @@
 
 public class ScanMappings
 {
-    public static Scan ToEntity(string userId, string? name, ScanAnalysisResult analysisResult)
+    public static Scan ToEntity(string userId, string? name, ScanAnalysisResult analysisResult, string rawIngredientsText)
     {
         return new Scan
         {
@@ -10,6 +10,7 @@ public class ScanMappings
             UserId = userId,
             Name = string.IsNullOrWhiteSpace(name) ? null : name.Trim(),
             ScannedAt = DateTime.UtcNow,
+            ScannedIngredientsText = rawIngredientsText,
             DetectedAllergies = analysisResult.DetectedAllergies
                 .Select(ToEntity)
                 .ToList()
@@ -46,6 +47,7 @@ public class ScanMappings
             UserId = scan.UserId,
             Name = scan.Name,
             ScannedAt = scan.ScannedAt,
+            ScannedIngredientsText = scan.ScannedIngredientsText,
             DetectedAllergies = scan.DetectedAllergies
                 .Select(ToResponse)
                 .ToList()

@@ -5,7 +5,6 @@ using SafeBite_Backend_H6.API.Services.Scans;
 using SafeBite_Backend_H6.API.Repositories;
 using SafeBite_Backend_H6.API.Interfaces.Services.OCR;
 using SafeBite_Backend_H6.API.Shared;
-using SafeBiteApi.Utilities;
 using SafeBite_Backend_H6.API.Interfaces.Repositories;
 using SafeBite_Backend_H6.API.Interfaces.Services;
 using SafeBite_Backend_H6.API.Contracts.Requests.Scans;
