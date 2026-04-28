@@ -60,7 +60,7 @@ public class ScanService : IScanService
         _allergyMatcher.MergeResults(analysisResult, localMatches);
 
         // 7. Gem i databasen
-        Scan scan = ScanMappings.ToScanEntity(userId, request.Name, analysisResult);
+        Scan scan = ScanMappings.ToEntity(userId, request.Name, analysisResult, ocrResult.IngredientsText);
 
         await _scanRepository.AddAsync(scan);
         await _scanRepository.SaveChangesAsync();
