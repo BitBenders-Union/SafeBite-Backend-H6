@@ -9,7 +9,8 @@ public static class AllergyUserMappings
         {
             UserId = item.UserId,
             AllergyId = item.AllergyId,
-            AllergyName = allergyName.Length > 0 ? $"{char.ToUpper(allergyName[0])}{allergyName[1..]}" : allergyName
+            AllergyName = allergyName.Length > 0 ? $"{char.ToUpper(allergyName[0])}{allergyName[1..]}" : allergyName,
+            Icon = item.Allergy.Icon
         };
     }
 
