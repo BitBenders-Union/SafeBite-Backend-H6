@@ -5,5 +5,6 @@ public class AllergyUserResponse
     public string UserId { get; set; }
     public Guid AllergyId { get; set; }
     public string AllergyName { get; set; } = string.Empty;
+    public string Icon { get; set; } = string.Empty;
 
 }
