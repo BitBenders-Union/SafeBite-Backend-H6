@@ -59,8 +59,7 @@ public class UserService : IUserService
         var result = await _userManager.AddToRoleAsync(user, roleName);
 
         if (!result.Succeeded)
-            throw new InvalidOperationException(
-                string.Join(", ", result.Errors.Select(e => e.Description)));
+            throw new InvalidOperationException(string.Join(", ", result.Errors.Select(e => e.Description)));
     }
 
     public async Task DeactivateUserAsync(string userId)
