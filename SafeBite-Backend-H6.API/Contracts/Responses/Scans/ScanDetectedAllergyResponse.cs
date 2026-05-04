@@ -3,7 +3,6 @@
 public class ScanDetectedAllergyResponse
 {
     public Guid Id { get; set; }
-    public Guid AllergyId { get; set; }
     public string AllergyName { get; set; } = null!;
     public List<DetectedIngredientMatchResponse> MatchedIngredients { get; set; } = [];
 }

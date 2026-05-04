@@ -22,9 +22,9 @@ public static class ScanMappings
         return new ScanDetectedAllergies
         {
             Id = Guid.NewGuid(),
-            AllergyId = item.AllergyId,
+            AllergyId = item.AllergyType == AllergyType.Allergy ? item.AllergyId : null,
+            CustomAllergyId = item.AllergyType == AllergyType.CustomAllergy ? item.AllergyId : null,
             MatchedIngredients = item.MatchedIngredients
-                .Where(mi => !string.IsNullOrWhiteSpace(mi))
                 .Select(ToDetectedIngredientMatchEntity)
                 .ToList()
         };
@@ -59,8 +59,7 @@ public static class ScanMappings
         return new ScanDetectedAllergyResponse
         {
             Id = item.Id,
-            AllergyId = item.AllergyId,
-            AllergyName = item.Allergy?.Name ?? string.Empty,
+            AllergyName = item.Allergy?.Name ?? item.CustomAllergy?.Name ?? string.Empty,
             MatchedIngredients = item.MatchedIngredients
                 .Select(ToDetectedIngredientMatchResponse)
                 .ToList()

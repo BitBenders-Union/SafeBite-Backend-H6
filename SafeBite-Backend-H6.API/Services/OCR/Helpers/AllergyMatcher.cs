@@ -32,6 +32,7 @@ public class AllergyMatcher : IAllergyMatcher
                     {
                         AllergyId = allergy.AllergyId,
                         AllergyName = allergy.AllergyName,
+                        AllergyType = allergy.AllergyType,
                         MatchedIngredients = CleanOcrNoise(foundIngredients)
                     });
                 }
@@ -44,7 +45,7 @@ public class AllergyMatcher : IAllergyMatcher
     {
         foreach (var localItem in local)
         {
-            var existingAiItem = ai.DetectedAllergies.FirstOrDefault(a => a.AllergyId == localItem.AllergyId);
+            var existingAiItem = ai.DetectedAllergies.FirstOrDefault(a => a.AllergyId == localItem.AllergyId && a.AllergyType == localItem.AllergyType);
 
             if (existingAiItem == null)
             {

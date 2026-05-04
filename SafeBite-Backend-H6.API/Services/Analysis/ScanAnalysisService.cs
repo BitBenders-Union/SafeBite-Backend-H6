@@ -65,6 +65,7 @@ public class ScanAnalysisService : IScanAnalysisService
                     {
                         AllergyId = allergyId,
                         AllergyName = allowedAllergy.AllergyName,
+                        AllergyType = allowedAllergy.AllergyType,
                         MatchedIngredients = item.MatchedIngredients?.Where(ingredient => !string.IsNullOrWhiteSpace(ingredient)).Select(ingredient => ingredient.Trim()).Distinct(StringComparer.OrdinalIgnoreCase).ToList() ?? []
                     });
                 }

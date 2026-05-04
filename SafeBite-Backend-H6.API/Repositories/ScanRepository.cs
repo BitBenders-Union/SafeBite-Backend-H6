@@ -15,16 +15,24 @@ public class ScanRepository : BaseRepository<Scan>, IScanRepository
                 .ThenInclude(sda => sda.Allergy)
             .Include(s => s.DetectedAllergies)
                 .ThenInclude(sda => sda.MatchedIngredients)
+            .Include(s => s.DetectedAllergies)
+                .ThenInclude(sda => sda.CustomAllergy)
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
-            // we only search for allergies. this can also be changed into searching for the scan name.
-            // this is to make the query faster, instead of searching for both name, allergyname, ingredientname.
-            var trimmed = searchTerm.Trim();
+
+            var normalized = StringHelpers.NormalizeName(searchTerm);
 
             query = query.Where(s =>
-                s.DetectedAllergies.Any(da => da.Allergy.Name.Contains(trimmed)));
+                  s.DetectedAllergies.Any(da =>
+                      (da.Allergy != null &&
+                       da.Allergy.NormalizedName.Contains(normalized)) ||
+
+                      (da.CustomAllergy != null &&
+                       da.CustomAllergy.NormalizedName.Contains(normalized))
+                  )
+              );
         }
 
         if (hasDetectedAllergies.HasValue)
@@ -45,6 +53,8 @@ public class ScanRepository : BaseRepository<Scan>, IScanRepository
                 .ThenInclude(sda => sda.Allergy)
             .Include(s => s.DetectedAllergies)
                 .ThenInclude(sda => sda.MatchedIngredients)
+            .Include(s => s.DetectedAllergies)
+                .ThenInclude(sda => sda.CustomAllergy)
             .FirstOrDefaultAsync(s => s.Id == scanId);
     }
 
@@ -56,6 +66,8 @@ public class ScanRepository : BaseRepository<Scan>, IScanRepository
                 .ThenInclude(sda => sda.Allergy)
             .Include(s => s.DetectedAllergies)
                 .ThenInclude(sda => sda.MatchedIngredients)
+            .Include(s => s.DetectedAllergies)
+                .ThenInclude(sda => sda.CustomAllergy)
             .FirstOrDefaultAsync(s => s.Id == scanId && s.UserId == userId);
     }
 
