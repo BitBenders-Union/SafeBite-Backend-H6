@@ -103,7 +103,8 @@ public class CustomAllergyService : ICustomAllergyService
             .Select(x => new AllergyAnalysisItem
             {
                 AllergyId = x.Id,
-                AllergyName = x.Name
+                AllergyName = x.Name,
+                AllergyType = AllergyType.CustomAllergy
             })
             .ToListAsync();
     }

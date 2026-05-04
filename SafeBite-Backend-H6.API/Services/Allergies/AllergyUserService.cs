@@ -72,9 +72,10 @@ public class AllergyUserService : IAllergyUserService
             .Select(x => new AllergyAnalysisItem
             {
                 AllergyId = x.AllergyId,
-                AllergyName = x.Allergy.Name
+                AllergyName = x.Allergy.Name,
+                AllergyType = AllergyType.Allergy
             })
-            .ToListAsync();
+            .ToListAsync(); 
 
         return items;
     }

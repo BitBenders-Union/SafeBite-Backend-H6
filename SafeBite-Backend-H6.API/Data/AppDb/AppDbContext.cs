@@ -78,18 +78,25 @@ public class AppDbContext : DbContext
             entity.HasKey(sda => sda.Id);
 
             entity.HasOne(sda => sda.Scan)
-            .WithMany(sda => sda.DetectedAllergies)
-            .HasForeignKey(sda => sda.ScanId)
-            .OnDelete(DeleteBehavior.Cascade);
+                .WithMany(s => s.DetectedAllergies)
+                .HasForeignKey(sda => sda.ScanId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             entity.HasOne(sda => sda.Allergy)
-            .WithMany(sda => sda.ScanDetectedAllergies)
-            .HasForeignKey(sda => sda.AllergyId)
-            .OnDelete(DeleteBehavior.Restrict);
+                .WithMany(a => a.ScanDetectedAllergies)
+                .HasForeignKey(sda => sda.AllergyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(sda => sda.CustomAllergy)
+                .WithMany()
+                .HasForeignKey(sda => sda.CustomAllergyId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             entity.HasIndex(sda => new { sda.ScanId, sda.AllergyId })
-            .IsUnique();
+                .IsUnique();
 
+            entity.HasIndex(sda => new { sda.ScanId, sda.CustomAllergyId })
+                .IsUnique();
         });
 
 
