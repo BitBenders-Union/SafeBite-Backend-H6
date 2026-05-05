@@ -13,6 +13,7 @@ using SafeBite_Backend_H6.API.Contracts.Responses.OCR;
 using SafeBite_Backend_H6.API.Contracts.Requests.Analysis;
 using SafeBite_Backend_H6.API.Contracts.Responses.Analysis;
 using SafeBite_Backend_H6.API.Entities.Scans;
+using Microsoft.Extensions.Logging;
 
 namespace SafeBite_Backend_H6.Test.Services;
 
@@ -24,6 +25,7 @@ public class ScanServiceTests
     private readonly Mock<IScanAnalysisService> _aiMock = new();
     private readonly Mock<IAllergyMatcher> _matcherMock = new();
 
+
     private readonly ScanService _sut;
 
     public ScanServiceTests()
@@ -33,7 +35,9 @@ public class ScanServiceTests
             _ocrMock.Object,
             _userAllergyMock.Object,
             _aiMock.Object,
-            _matcherMock.Object);
+            _matcherMock.Object,
+            new LoggerFactory().CreateLogger<ScanService>()
+            );
     }
 
     // Hjælpe-metode til at lave en falsk fil

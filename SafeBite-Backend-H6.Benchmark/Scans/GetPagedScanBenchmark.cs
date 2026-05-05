@@ -2,6 +2,7 @@
 using BenchmarkDotNet.Attributes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using SafeBite_Backend_H6.API.Contracts.Requests.Analysis;
 using SafeBite_Backend_H6.API.Contracts.Responses.Analysis;
 using SafeBite_Backend_H6.API.Contracts.Responses.OCR;
@@ -56,7 +57,8 @@ public class GetPagedScanBenchmark
             ocrService,
             userAllergyService,
             scanAnalysisService,
-            allergyMatcher
+            allergyMatcher,
+            new LoggerFactory().CreateLogger<ScanService>()
 
         );
     }

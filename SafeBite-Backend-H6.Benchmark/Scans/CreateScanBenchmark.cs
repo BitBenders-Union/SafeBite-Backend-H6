@@ -4,6 +4,7 @@ using BenchmarkDotNet.Attributes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using SafeBite_Backend_H6.API.Contracts.Requests.Analysis;
 using SafeBite_Backend_H6.API.Contracts.Requests.Scans;
 using SafeBite_Backend_H6.API.Contracts.Responses.Analysis;
@@ -72,7 +73,9 @@ public class CreateScanBenchmark
             ocrService,
             userAllergyService,
             scanAnalysisService,
-            allergyMatcher
+            allergyMatcher,
+            new LoggerFactory().CreateLogger<ScanService>()
+
         );
         _imageFile = CreateFakeImageFile();
     }
