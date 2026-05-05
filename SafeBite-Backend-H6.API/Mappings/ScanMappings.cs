@@ -11,6 +11,7 @@ public static class ScanMappings
             Name = !string.IsNullOrWhiteSpace(name) ? StringHelpers.ToTitleCase(name) : null,
             ScannedAt = DateTime.UtcNow,
             ScannedIngredientsText = rawIngredientsText,
+            NormalizedScannedIngredientsText = StringHelpers.NormalizeName(rawIngredientsText),
             DetectedAllergies = analysisResult.DetectedAllergies
                 .Select(ToScanDetectedAllergyEntity)
                 .ToList()
