@@ -12,8 +12,8 @@ using SafeBite_Backend_H6.API.Data.AppDb;
 namespace SafeBite_Backend_H6.API.Data.Migrations.App
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260505102719_NormalizedIngredientList")]
-    partial class NormalizedIngredientList
+    [Migration("20260505211712_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
