@@ -7,6 +7,6 @@ public class Scan
     public string? Name { get; set; }
     public DateTime ScannedAt { get; set; }
     public string ScannedIngredientsText { get; set; } = string.Empty;
-
+    public string NormalizedScannedIngredientsText { get; set; } = string.Empty;
     public ICollection<ScanDetectedAllergies> DetectedAllergies { get; set; } = [];
 }

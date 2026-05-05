@@ -31,7 +31,8 @@ public class ScanRepository : BaseRepository<Scan>, IScanRepository
 
                       (da.CustomAllergy != null &&
                        da.CustomAllergy.NormalizedName.Contains(normalized))
-                  )
+                  ) ||
+                  s.NormalizedScannedIngredientsText.Contains(normalized)
               );
         }
 
