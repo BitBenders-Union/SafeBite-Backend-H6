@@ -5,7 +5,7 @@
 namespace SafeBite_Backend_H6.API.Data.Migrations.App
 {
     /// <inheritdoc />
-    public partial class NormalizedNamesFix : Migration
+    public partial class NormalizedIngredientList : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
