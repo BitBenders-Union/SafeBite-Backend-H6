@@ -7,23 +7,30 @@ public class ScanService : IScanService
     private readonly IUserAllergyAnalysisService _userAllergyAnalysisService;
     private readonly IScanAnalysisService _scanAnalysisService;
     private readonly IAllergyMatcher _allergyMatcher;
+    private readonly ILogger<ScanService> _logger;  
 
     public ScanService(
         IScanRepository scanRepository,
         IOcrService ocrService,
         IUserAllergyAnalysisService userAllergyAnalysisService,
         IScanAnalysisService scanAnalysisService,
-        IAllergyMatcher allergyMatcher)
+        IAllergyMatcher allergyMatcher,
+        ILogger<ScanService> logger)
     {
         _scanRepository = scanRepository;
         _ocrService = ocrService;
         _userAllergyAnalysisService = userAllergyAnalysisService;
         _scanAnalysisService = scanAnalysisService;
         _allergyMatcher = allergyMatcher;
+        _logger = logger;
     }
 
     public async Task<ScanResponse> CreateAsync(string userId, CreateScanRequest request)
     {
+
+        var totalSw = Stopwatch.StartNew();
+
+        _logger.LogInformation("[SCAN] Started");
         // 1. Validering
         ArgumentNullException.ThrowIfNull(userId);
         ArgumentNullException.ThrowIfNull(request);
@@ -34,18 +41,38 @@ public class ScanService : IScanService
         if (request.Image is null || request.Image.Length == 0)
             throw new ArgumentException("Image is required.");
 
+        _logger.LogInformation("[SCAN] Validation done in {Ms} ms", totalSw.ElapsedMilliseconds);
+        var sw = Stopwatch.StartNew();
+
         // 2. OCR 
         using var stream = request.Image.OpenReadStream();
         OcrResponseDto ocrResult = await _ocrService.ExtractTextFromImageAsync(stream, request.Lang);
 
+        _logger.LogInformation("[SCAN] OCR done in {Ms} ms", sw.ElapsedMilliseconds);
+
+
         if (string.IsNullOrWhiteSpace(ocrResult.IngredientsText))
             throw new InvalidOperationException("No ingredients text could be extracted from the image.");
+
+
+        sw.Restart();
 
         // 3. Hent brugerens allergier også custom
         var userAllergies = await _userAllergyAnalysisService.GetAllAllergiesForUserAsync(userId);
 
+        _logger.LogInformation("[SCAN] Fetch allergies done in {Ms} ms", sw.ElapsedMilliseconds);
+
+
+        sw.Restart();
+
         // 4. DETERMINISTIC MATCH Via hjælpeklasse
         var localMatches = _allergyMatcher.MatchLocalAllergies(ocrResult.IngredientsText, userAllergies);
+
+        _logger.LogInformation("[SCAN] Local match done in {Ms} ms", sw.ElapsedMilliseconds);
+
+
+        sw.Restart();
+
 
         // 5. AI ANALYSE (OpenAI)
         var analysisRequest = new ScanAnalysisRequest
@@ -56,14 +83,31 @@ public class ScanService : IScanService
 
         var analysisResult = await _scanAnalysisService.AnalyzeIngredientsAsync(analysisRequest);
 
+        _logger.LogInformation("[SCAN] AI analysis done in {Ms} ms", sw.ElapsedMilliseconds);
+
+
+        sw.Restart();
+
         // 6. MERGE ved hjælp fra hjælpeklassen til at samle fund fra AI og Determistic
         _allergyMatcher.MergeResults(analysisResult, localMatches);
 
+        _logger.LogInformation("[SCAN] Merge done in {Ms} ms", sw.ElapsedMilliseconds);
+
+
+        sw.Restart();
         // 7. Gem i databasen
         Scan scan = ScanMappings.ToEntity(userId, request.Name, analysisResult, ocrResult.IngredientsText);
 
         await _scanRepository.AddAsync(scan);
         await _scanRepository.SaveChangesAsync();
+
+        _logger.LogInformation("[SCAN] DB save done in {Ms} ms", sw.ElapsedMilliseconds);
+
+        sw.Restart();
+
+        _logger.LogInformation("[SCAN] Reload done in {Ms} ms", sw.ElapsedMilliseconds);
+
+        _logger.LogInformation("[SCAN] TOTAL TIME: {Ms} ms", totalSw.ElapsedMilliseconds);
 
         // 8. Hent den fulde scan
         var createdScan = await _scanRepository.GetFullScanByIdAsync(scan.Id);

@@ -8,13 +8,14 @@ public class OcrService : IOcrService
     private readonly string _defaultLangs = "eng+dan+swe+nor+fra";
     private const float ConfidenceThreshold = 0.75f;
 
-    public OcrService(IImageProcessor imageProcessor, IAiExtractor aiExtractor)
+    public OcrService(IImageProcessor imageProcessor, IAiExtractor aiExtractor, IWebHostEnvironment env)
     {
         _imageProcessor = imageProcessor;
         _aiExtractor = aiExtractor;
 
         // Tell Tesseract where to find the language training data
-        _tessDataPath = Path.Combine(AppContext.BaseDirectory, "tessdata");
+        //_tessDataPath = Path.Combine(AppContext.BaseDirectory, "tessdata");
+        _tessDataPath = Path.Combine(env.ContentRootPath, "tessdata");
     }
 
     public async Task<OcrResponseDto> ExtractTextFromImageAsync(Stream imageStream, string languages = null)
