@@ -36,24 +36,41 @@ public class OcrService : IOcrService
         //If Tesseract failed or the text was gibberish, we use GPT-4o Vision as a fallback
         return await _aiExtractor.FallbackWithVisionAsync(processedBytes, languages);
     }
-
     private OcrResultDto RunTesseract(byte[] imageBytes, string lang)
     {
         try
         {
-            using var pix = Pix.LoadFromMemory(imageBytes);
-            using var engine = new TesseractEngine(_tessDataPath, lang, EngineMode.Default);
-            using var page = engine.Process(pix, PageSegMode.SingleBlock);
+            // Define the timeout duration
+            var timeout = TimeSpan.FromSeconds(9);
 
-            return new OcrResultDto
+            var ocrTask = Task.Run(() =>
             {
-                Text = page.GetText().Trim(),
-                Confidence = page.GetMeanConfidence()
-            };
+                using var pix = Pix.LoadFromMemory(imageBytes);
+                using var engine = new TesseractEngine(_tessDataPath, lang, EngineMode.Default);
+                using var page = engine.Process(pix, PageSegMode.SingleBlock);
+
+                return new OcrResultDto
+                {
+                    Text = page.GetText().Trim(),
+                    Confidence = page.GetMeanConfidence()
+                };
+            });
+
+            // Wait for the task to complete or the timeout to hit
+            if (ocrTask.Wait(timeout))
+            {
+                return ocrTask.Result;
+            }
+            else
+            {
+                // Timeout reached - log it and return null to trigger your AI Fallback
+                Console.WriteLine("Tesseract timed out after 9 seconds.");
+                return null;
+            }
         }
-        catch
+        catch (Exception ex)
         {
-            // If Tesseract crashes, it return null to trigger fallback
+            // Log exception if needed
             return null;
         }
     }
