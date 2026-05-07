@@ -132,6 +132,8 @@ jobs:
             -e ASPNETCORE_ENVIRONMENT=Development \
             -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/safebite.pfx \
             -e ASPNETCORE_Kestrel__Certificates__Default__Password='${{ secrets.SSL_PASS }}' \
+            -e Testing__UseFakeOcr=false \
+            -e Testing__UseFakeScanAnalysis=false \
             -e OpenAI__ApiKey='${{ secrets.OPENAI_KEY }}' \
             -e Email__From='${{ secrets.EMAIL_FROM }}' \
             -e Email__Username='${{ secrets.EMAIL_USER }}' \
