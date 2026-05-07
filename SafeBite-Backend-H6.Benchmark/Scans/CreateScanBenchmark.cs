@@ -40,18 +40,14 @@ public class CreateScanBenchmark
     public void GlobalSetup()
     {
         var config = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddUserSecrets<GetPagedScanBenchmark>(optional: false)
+            .AddEnvironmentVariables()
             .Build();
 
-        var connectionString = config["ConnectionStrings:AppConnection"]
-            ?? throw new InvalidOperationException("Connection string 'AppConnection' was not found.");
+        var connectionString = config["ConnectionStrings:AppConnection"] ?? throw new InvalidOperationException("Connection string 'AppConnection' was not found.");
 
-        UserId = config["User:UserId"]
-            ?? throw new InvalidOperationException("Id string 'UserId' was not found");
+        UserId = config["User:UserId"] ?? throw new InvalidOperationException("Id string 'UserId' was not found");
 
-        var peanutId = config["Allergy:PeanutAllergyId"]
-            ?? throw new InvalidOperationException("PeanutAllergyId missing");
+        var peanutId = config["Allergy:PeanutAllergyId"] ?? throw new InvalidOperationException("PeanutAllergyId missing");
 
         PeanutAllergyId = Guid.Parse(peanutId);
 

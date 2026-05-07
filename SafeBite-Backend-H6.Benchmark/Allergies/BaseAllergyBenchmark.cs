@@ -17,12 +17,10 @@ public abstract class BaseAllergyBenchmark
     public void GlobalSetup()
     {
         var config = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddUserSecrets<BaseAllergyBenchmark>(optional: false)
+            .AddEnvironmentVariables()
             .Build();
 
-        var connectionString = config["ConnectionStrings:AppConnection"]
-            ?? throw new InvalidOperationException("Connection string 'AppConnection' was not found.");
+        var connectionString = config["ConnectionStrings:AppConnection"] ?? throw new InvalidOperationException("Connection string 'AppConnection' was not found.");
 
         var options = new DbContextOptionsBuilder<AppDbContext>()
             .UseNpgsql(connectionString)

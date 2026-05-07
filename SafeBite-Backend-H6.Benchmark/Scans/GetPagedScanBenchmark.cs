@@ -28,8 +28,7 @@ public class GetPagedScanBenchmark
     public void GlobalSetup()
     {
         var config = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddUserSecrets<GetPagedScanBenchmark>(optional: false)
+            .AddEnvironmentVariables()
             .Build();
 
         var connectionString = config["ConnectionStrings:AppConnection"]
