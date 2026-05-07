@@ -3,13 +3,6 @@
 var builder = WebApplication.CreateBuilder(args);
 
 
-// also load secrests in loadtest environment. standard is it only loads in development - this is made behind the scenes.
-if (builder.Environment.IsDevelopment() || builder.Environment.IsEnvironment("LoadTest"))
-{
-    builder.Configuration.AddUserSecrets<Program>();
-}
-
-
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("AppConnection")));
 
@@ -33,7 +26,9 @@ builder.Services
 builder.Services.AddRateLimiter(options =>
 {
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests; // proper status code instead of 503
-
+    var adminLimit = builder.Configuration.GetValue<int>("RateLimiting:Global:AdminPermitLimit");
+    var userLimit = builder.Configuration.GetValue<int>("RateLimiting:Global:UserPermitLimit");
+    var scanLimit = builder.Configuration.GetValue<int>("RateLimiting:Scan:PermitLimit");
 
     // global limit applies different limits for admins and non-admins.
     options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
@@ -47,7 +42,7 @@ builder.Services.AddRateLimiter(options =>
 
         return RateLimitPartition.GetFixedWindowLimiter(partitionKey, _ => new FixedWindowRateLimiterOptions
         {
-            PermitLimit = isAdmin ? 200 : 50,
+            PermitLimit = isAdmin ? adminLimit : userLimit,
             Window = TimeSpan.FromMinutes(1),
             QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
             QueueLimit = 0,
@@ -67,7 +62,7 @@ builder.Services.AddRateLimiter(options =>
             $"Scan:{userId}",
             _ => new FixedWindowRateLimiterOptions
             {
-                PermitLimit = 10,
+                PermitLimit = scanLimit,
                 Window = TimeSpan.FromMinutes(1),
                 QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
                 QueueLimit = 4,
@@ -113,18 +108,25 @@ builder.Services.AddScoped<IAllergyMatcher, AllergyMatcher>();
 
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 
-
-if(builder.Environment.IsEnvironment("LoadTest"))
+var useFakeOcr = builder.Configuration.GetValue<bool>("Testing:UseFakeOcr");
+if (useFakeOcr)
 {
     builder.Services.AddScoped<IOcrService, FakeOcrService>();
-    builder.Services.AddScoped<IScanAnalysisService, FakeScanAnalysisService>();
 }
 else
 {
     builder.Services.AddScoped<IOcrService, OcrService>();
-    builder.Services.AddScoped<IScanAnalysisService, ScanAnalysisService>();
 }
 
+var useFakeScan = builder.Configuration.GetValue<bool>("Testing:UseFakeScan");
+if (useFakeScan)
+{
+    builder.Services.AddScoped<IScanAnalysisService, FakeScanAnalysisService>();
+}
+else
+{
+    builder.Services.AddScoped<IScanAnalysisService, ScanAnalysisService>();
+}
 
 # endregion
 
@@ -159,7 +161,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment() || builder.Environment.IsEnvironment("LoadTest"))
+if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 
@@ -176,17 +178,15 @@ if (app.Environment.IsDevelopment() || builder.Environment.IsEnvironment("LoadTe
     });
 }
 
-app.UseAuthentication();
 app.UseHttpsRedirection();
-
-app.UseAuthorization();
 
 app.UseCors("AllowAllOrigins");
 
-if (!builder.Environment.IsEnvironment("LoadTest"))
-{
-    app.UseRateLimiter();
-}
+app.UseAuthentication();
+
+app.UseRateLimiter();
+
+app.UseAuthorization();
 
 app.MapControllers();
 app.MapGroup("/auth").MapCustomIdentityApi<ApplicationUser>();
