@@ -118,7 +118,7 @@ else
     builder.Services.AddScoped<IOcrService, OcrService>();
 }
 
-var useFakeScan = builder.Configuration.GetValue<bool>("Testing:UseFakeScan");
+var useFakeScan = builder.Configuration.GetValue<bool>("Testing:UseFakeScanAnalysis");
 if (useFakeScan)
 {
     builder.Services.AddScoped<IScanAnalysisService, FakeScanAnalysisService>();
