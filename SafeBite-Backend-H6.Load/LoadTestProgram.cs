@@ -13,14 +13,15 @@ using SafeBite_Backend_H6.Load.Utility;
 
 public partial class LoadTestProgram
 {
-    private const string baseUrl = "https://localhost:7002";
     private static async Task Main(string[] args)
     {
+
+
         Console.ForegroundColor = ConsoleColor.Red;
 
         Console.WriteLine("""
         WARNING:
-        Make sure the API is running in the LoadTest environment.
+        Make sure the Development API is deployed with fake OCR and fake scan analysis enabled.
 
         Run the API with:
         dotnet run --launch-profile loadtest
@@ -44,6 +45,8 @@ public partial class LoadTestProgram
         var config = new ConfigurationBuilder()
             .AddUserSecrets<LoadTestProgram>()
             .Build();
+
+        var baseUrl = config["Api:BaseUrl"] ?? throw new InvalidOperationException("BaseUrl missing.");
 
         var email = config["User:AdminEmail"] ?? throw new InvalidOperationException("Admin email is not configured.");
         var password = config["User:AdminPassword"] ?? throw new InvalidOperationException("Admin password is not configured.");
