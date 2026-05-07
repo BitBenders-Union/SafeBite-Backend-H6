@@ -126,6 +126,8 @@ jobs:
             -e ASPNETCORE_URLS='https://+;http://+' \
             -e ASPNETCORE_HTTPS_PORT=443 \
             -e ASPNETCORE_ENVIRONMENT=Development \
+            -e Testing__UseFakeOcr=false \
+            -e Testing__UseFakeScan=false \
             -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/safebite.pfx \
             -e ASPNETCORE_Kestrel__Certificates__Default__Password='${{ secrets.SSL_PASS }}' \
             -e OpenAI__ApiKey='${{ secrets.OPENAI_KEY }}' \
