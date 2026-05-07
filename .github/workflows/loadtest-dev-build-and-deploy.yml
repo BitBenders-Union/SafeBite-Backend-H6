@@ -121,8 +121,8 @@ jobs:
             echo "Running new Dev container with HTTPS enabled..."
             docker run -d -p 9091:80 -p 9444:443 --network safebite-network \
             -v /etc/letsencrypt/live/chimpchonkserver.duckdns.org:/https:ro \
-            -e ConnectionStrings__AppConnection='${{ secrets.APP_DB }}' \
-            -e ConnectionStrings__AuthConnection='${{ secrets.AUTH_DB }}' \
+            -e ConnectionStrings__AppConnection='${{ secrets.LOADTEST_APP_DB }}' \
+            -e ConnectionStrings__AuthConnection='${{ secrets.LOADTEST_AUTH_DB }}' \
             -e ASPNETCORE_URLS='https://+;http://+' \
             -e ASPNETCORE_HTTPS_PORT=443 \
             -e ASPNETCORE_ENVIRONMENT=Development \
