@@ -129,7 +129,7 @@ jobs:
             -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/safebite.pfx \
             -e ASPNETCORE_Kestrel__Certificates__Default__Password='${{ secrets.SSL_PASS }}' \
             -e Testing__UseFakeOcr=true \
-            -e Testing__UseFakeScan=true \
+            -e Testing__UseFakeScanAnalysis=true \
             -e RateLimiting__Global__AdminPermitLimit=10000 \
             -e RateLimiting__Global__UserPermitLimit=5000 \
             -e RateLimiting__Scan__PermitLimit=500 \
