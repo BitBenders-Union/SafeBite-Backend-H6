@@ -10,6 +10,7 @@ public class ScanRepository : BaseRepository<Scan>, IScanRepository
     {
         var query = _context.Scans
             .AsNoTracking()
+            .AsSplitQuery() // warning from ef core tells us we should use this https://learn.microsoft.com/en-us/ef/core/querying/single-split-queries
             .Where(s => s.UserId == userId)
             .Include(s => s.DetectedAllergies)
                 .ThenInclude(sda => sda.Allergy)
@@ -50,6 +51,7 @@ public class ScanRepository : BaseRepository<Scan>, IScanRepository
     {
         return await _context.Scans
             .AsNoTracking()
+            .AsSplitQuery()
             .Include(s => s.DetectedAllergies)
                 .ThenInclude(sda => sda.Allergy)
             .Include(s => s.DetectedAllergies)
@@ -63,6 +65,7 @@ public class ScanRepository : BaseRepository<Scan>, IScanRepository
     {
         return await _context.Scans
             .AsNoTracking()
+            .AsSplitQuery()
             .Include(s => s.DetectedAllergies)
                 .ThenInclude(sda => sda.Allergy)
             .Include(s => s.DetectedAllergies)
