@@ -25,8 +25,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY ./SafeBite-Backend-H6.API/tessdata ./tessdata
 ENV TESSDATA_PREFIX=/app/tessdata
 
-USER app
-
 FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG configuration=Release
 WORKDIR /src
@@ -44,15 +42,17 @@ RUN dotnet publish "SafeBite-Backend-H6.API/SafeBite-Backend-H6.API.csproj" \
     -o /app/publish \
     /p:UseAppHost=false
 
-RUN dotnet publish "SafeBite-Backend-H6.Benchmark/SafeBite-Backend-H6.Benchmark.csproj" \
-    -c $configuration \
-    -o /benchmark/publish \
-    /p:UseAppHost=false
-
 FROM base AS final
 WORKDIR /app
 
 COPY --from=build /app/publish .
-COPY --from=build /benchmark/publish /benchmark
+
+# copy entire source tree for BenchmarkDotNet
+COPY --from=build /src /src
+
+# permissions for BenchmarkDotNet artifacts
+RUN mkdir -p /benchmark \
+    && chmod -R 777 /benchmark \
+    && chmod -R 777 /src
 
 ENTRYPOINT ["dotnet", "SafeBite-Backend-H6.API.dll"]
