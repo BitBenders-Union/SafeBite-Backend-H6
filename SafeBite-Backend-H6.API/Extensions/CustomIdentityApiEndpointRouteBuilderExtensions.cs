@@ -86,6 +86,15 @@ public static class CustomIdentityApiEndpointRouteBuilderExtensions
         {
             var signInManager = sp.GetRequiredService<SignInManager<TUser>>();
 
+            var userManager = sp.GetRequiredService<UserManager<TUser>>();
+
+            var user = await userManager.FindByEmailAsync(login.Email);
+
+            if (user is ApplicationUser appUser && appUser.IsDeactivated)
+            {
+                return TypedResults.Problem(statusCode: StatusCodes.Status401Unauthorized);
+            }
+
             var useCookieScheme = (useCookies == true) || (useSessionCookies == true);
             var isPersistent = (useCookies == true) && (useSessionCookies != true);
             signInManager.AuthenticationScheme = useCookieScheme ? IdentityConstants.ApplicationScheme : IdentityConstants.BearerScheme;
@@ -120,6 +129,8 @@ public static class CustomIdentityApiEndpointRouteBuilderExtensions
             var refreshTokenProtector = bearerTokenOptions.Get(IdentityConstants.BearerScheme).RefreshTokenProtector;
             var refreshTicket = refreshTokenProtector.Unprotect(refreshRequest.RefreshToken);
 
+
+
             // Reject the /refresh attempt with a 401 if the token expired or the security stamp validation fails
             if (refreshTicket?.Properties?.ExpiresUtc is not { } expiresUtc ||
                 timeProvider.GetUtcNow() >= expiresUtc ||
@@ -128,6 +139,10 @@ public static class CustomIdentityApiEndpointRouteBuilderExtensions
             {
                 return TypedResults.Challenge();
             }
+
+            if (user is ApplicationUser appUser && appUser.IsDeactivated)
+                return TypedResults.Challenge();
+
 
             var newPrincipal = await signInManager.CreateUserPrincipalAsync(user);
             return TypedResults.SignIn(newPrincipal, authenticationScheme: IdentityConstants.BearerScheme);
@@ -193,6 +208,9 @@ public static class CustomIdentityApiEndpointRouteBuilderExtensions
                 return TypedResults.Ok();
             }
 
+            if (user is ApplicationUser appUser && appUser.IsDeactivated)
+                return TypedResults.Ok();
+
             await SendConfirmationEmailAsync(user, userManager, context, resendRequest.Email);
             return TypedResults.Ok();
         });
@@ -234,6 +252,9 @@ public static class CustomIdentityApiEndpointRouteBuilderExtensions
             var userManager = sp.GetRequiredService<UserManager<TUser>>();
 
             var user = await userManager.FindByEmailAsync(resetRequest.Email);
+
+            if (user is ApplicationUser appUser && appUser.IsDeactivated)
+                return CreateValidationProblem(IdentityResult.Failed(userManager.ErrorDescriber.InvalidToken()));
 
             if (user is null || !(await userManager.IsEmailConfirmedAsync(user)))
             {
