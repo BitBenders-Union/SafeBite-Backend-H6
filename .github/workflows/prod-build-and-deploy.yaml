@@ -129,7 +129,6 @@ jobs:
             -e ConnectionStrings__AuthConnection='${{ secrets.AUTH_DB }}' \
             -e ASPNETCORE_URLS='https://+;http://+' \
             -e ASPNETCORE_HTTPS_PORT=443 \
-            -e ASPNETCORE_ENVIRONMENT=Development \
             -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/safebite.pfx \
             -e ASPNETCORE_Kestrel__Certificates__Default__Password='${{ secrets.SSL_PASS }}' \
             -e Testing__UseFakeOcr=false \
@@ -143,4 +142,13 @@ jobs:
             -e Email__EnableSsl='true' \
             --name "${container_name}" ghcr.io/${owner}/prod-safebite-api:${version}
 
-            echo "Deployed"
+            echo "API Healthcheck"
+            sleep 10
+
+            status_code=$(curl -k -s -o /dev/null -w "%{http_code}" https://localhost:8443/api/HealthCheck)
+            if [ "$status_code" = "200" ]; then
+              echo "Healthcheck OK (200) - Deployed."
+            else
+              echo "Healthcheck FAILED (HTTP $status_code) - Deployment failed."
+              exit 1
+            fi
