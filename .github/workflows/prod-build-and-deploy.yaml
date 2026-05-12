@@ -95,7 +95,7 @@ jobs:
               docker push ghcr.io/${owner}/prod-safebite-api:${version}
               docker push ghcr.io/${owner}/prod-safebite-api:latest
   deploy-to-vps:
-    needs: build-and-push
+    needs: build-and-push-image
     runs-on: ubuntu-latest
     environment: VPS_PROD
 
