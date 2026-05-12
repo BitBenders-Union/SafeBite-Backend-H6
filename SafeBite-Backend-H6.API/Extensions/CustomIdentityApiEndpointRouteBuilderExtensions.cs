@@ -215,26 +215,34 @@ public static class CustomIdentityApiEndpointRouteBuilderExtensions
             return TypedResults.Ok();
         });
 
+
         routeGroup.MapPost("/forgotPassword", async Task<Results<Ok, ValidationProblem>>
-            ([FromBody] ForgotPasswordRequest resetRequest, [FromServices] IServiceProvider sp) =>
+            ([FromBody] ForgotPasswordRequest resetRequest, HttpContext context, [FromServices] IServiceProvider sp) =>
         {
             var userManager = sp.GetRequiredService<UserManager<TUser>>();
+
             var user = await userManager.FindByEmailAsync(resetRequest.Email);
 
             if (user is ApplicationUser appUser && appUser.IsDeactivated)
                 return TypedResults.Ok();
 
-
             if (user is not null && await userManager.IsEmailConfirmedAsync(user))
             {
                 var code = await userManager.GeneratePasswordResetTokenAsync(user);
-                code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
 
-                await emailSender.SendPasswordResetCodeAsync(user, resetRequest.Email, HtmlEncoder.Default.Encode(code));
+                code = WebEncoders.Base64UrlEncode(
+                    Encoding.UTF8.GetBytes(code));
+
+                var request = context.Request;
+
+                var baseUrl = $"{request.Scheme}://{request.Host}";
+
+                var resetPasswordUrl = $"{baseUrl}/auth/resetPasswordPage" + $"?email={Uri.EscapeDataString(resetRequest.Email)}" + $"&code={Uri.EscapeDataString(code)}";
+
+                await emailSender.SendPasswordResetLinkAsync(user, resetRequest.Email, resetPasswordUrl);
             }
 
-            // Don't reveal that the user does not exist or is not confirmed, so don't return a 200 if we would have
-            // returned a 400 for an invalid code given a valid user email.
+            // Don't reveal that the user does not exist or is not confirmed
             return TypedResults.Ok();
         });
 
@@ -272,6 +280,84 @@ public static class CustomIdentityApiEndpointRouteBuilderExtensions
             }
 
             return TypedResults.Ok();
+        });
+
+
+        routeGroup.MapPost("/resetPasswordForm", async ([FromForm] string email, [FromForm] string resetCode, [FromForm] string newPassword, [FromServices] IServiceProvider sp) =>
+        {
+            var userManager = sp.GetRequiredService<UserManager<TUser>>();
+
+            var user = await userManager.FindByEmailAsync(email);
+
+            if (user is null)
+            {
+                return Results.Content(
+                    """
+                    <h1>Password reset failed</h1>
+                    <p>Invalid user.</p>
+                    """, "text/html");
+            }
+
+            try
+            {
+                var decodedCode = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(resetCode));
+
+                var result = await userManager.ResetPasswordAsync(user, decodedCode, newPassword);
+
+                if (!result.Succeeded)
+                {
+                    var errors = string.Join("<br>", result.Errors.Select(e => e.Description));
+
+                    return Results.Content(
+                        $"""
+                        <h1>Password reset failed</h1>
+                        <p>{errors}</p>
+                        """, "text/html");
+                }
+
+                return Results.Content(
+                    """
+                    <h1>Password reset successful</h1>
+                    <p>You can now log in with your new password.</p>
+                    """, "text/html");
+            }
+            catch
+            {
+                return Results.Content(
+                    """
+                    <h1>Password reset failed</h1>
+                    <p>The reset link is invalid.</p>
+                    """, "text/html");
+            }
+        })
+        .DisableAntiforgery();
+
+        routeGroup.MapGet("/resetPasswordPage", ([FromQuery] string email, [FromQuery] string code) =>
+        {
+            var html = $$"""
+            <html>
+            <body>
+                <h1>Reset Password</h1>
+
+                <form method="post" action="/auth/resetPasswordForm">
+                    <input type="hidden" name="email" value="{{email}}" />
+
+                    <input type="hidden" name="resetCode" value="{{code}}" />
+
+                    <div>
+                        <input type="password" name="newPassword" placeholder="New password" />
+                    </div>
+
+                    <button type="submit">
+                        Reset Password
+                    </button>
+                </form>
+
+            </body>
+            </html>
+            """;
+
+            return Results.Content(html, "text/html");
         });
 
         var accountGroup = routeGroup.MapGroup("/manage").RequireAuthorization();
@@ -368,7 +454,7 @@ public static class CustomIdentityApiEndpointRouteBuilderExtensions
             appUser.IsDeactivated = true;
             appUser.DeactivatedTime = DateTime.UtcNow;
 
-            var result =await userManager.UpdateAsync(appUser);
+            var result = await userManager.UpdateAsync(appUser);
 
             if (!result.Succeeded)
                 return Results.BadRequest(result.Errors);

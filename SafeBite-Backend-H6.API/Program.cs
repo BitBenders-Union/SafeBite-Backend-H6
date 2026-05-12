@@ -106,7 +106,7 @@ builder.Services.AddScoped<IScanRepository, ScanRepository>();
 builder.Services.AddScoped<IScanService, ScanService>();
 builder.Services.AddScoped<IAllergyMatcher, AllergyMatcher>();
 
-builder.Services.AddTransient<IEmailSender, EmailSender>();
+builder.Services.AddTransient<IEmailSender<ApplicationUser>, EmailSender>();
 
 var useFakeOcr = builder.Configuration.GetValue<bool>("Testing:UseFakeOcr");
 if (useFakeOcr)
