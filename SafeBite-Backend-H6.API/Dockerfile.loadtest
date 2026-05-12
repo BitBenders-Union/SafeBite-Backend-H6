@@ -1,0 +1,58 @@
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS base
+WORKDIR /app
+EXPOSE 8080
+EXPOSE 8081
+
+USER root
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      libc6-dev \
+      tesseract-ocr \
+      libleptonica-dev \
+      libtesseract-dev \
+      tesseract-ocr-eng \
+      tesseract-ocr-dan \
+      tesseract-ocr-swe \
+      tesseract-ocr-nor \
+      tesseract-ocr-fra \
+      && ldconfig \
+      && mkdir -p /app/x64 \
+      && cp /usr/lib/x86_64-linux-gnu/liblept.so.5      /app/x64/libleptonica-1.82.0.so \
+      && cp /usr/lib/x86_64-linux-gnu/libtesseract.so.5 /app/x64/libtesseract50.so \
+      && ln -sf /usr/lib/x86_64-linux-gnu/libdl.so.2    /usr/lib/x86_64-linux-gnu/libdl.so \
+      && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+COPY ./SafeBite-Backend-H6.API/tessdata ./tessdata
+ENV TESSDATA_PREFIX=/app/tessdata
+
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+ARG configuration=Release
+WORKDIR /src
+
+COPY . .
+
+RUN dotnet restore "SafeBite-Backend-H6.API/SafeBite-Backend-H6.API.csproj"
+
+RUN dotnet build "SafeBite-Backend-H6.API/SafeBite-Backend-H6.API.csproj" \
+    -c $configuration \
+    -o /app/build
+
+RUN dotnet publish "SafeBite-Backend-H6.API/SafeBite-Backend-H6.API.csproj" \
+    -c $configuration \
+    -o /app/publish \
+    /p:UseAppHost=false
+
+FROM base AS final
+WORKDIR /app
+
+COPY --from=build /app/publish .
+
+# copy entire source tree for BenchmarkDotNet
+COPY --from=build /src /src
+
+# permissions for BenchmarkDotNet artifacts
+RUN mkdir -p /benchmark \
+    && chmod -R 777 /benchmark \
+    && chmod -R 777 /src
+
+ENTRYPOINT ["dotnet", "SafeBite-Backend-H6.API.dll"]
