@@ -143,6 +143,13 @@ jobs:
             --name "${container_name}" ghcr.io/${owner}/prod-safebite-api:${version}
 
             sleep 10
+            status_code=$(curl -k -s -o /dev/null -w "%{http_code}" https://localhost:8443/api/HealthCheck)
+            if [ "$status_code" = "200" ]; then
+              echo "Healthcheck OK (200) - Deployed."
+            else
+              echo "Healthcheck FAILED (HTTP $status_code) - Deployment failed."
+              exit 1
+            fi
             echo "Deployed"
 
   peform-healthcheck:
