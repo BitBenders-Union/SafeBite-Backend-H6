@@ -90,7 +90,7 @@ jobs:
               version="dev-${{ github.event.release.tag_name || github.run_number }}"
               docker push ghcr.io/${owner}/dev-safebite-api:${version}
               docker push ghcr.io/${owner}/dev-safebite-api:latest
-  deploy:
+  deploy-to-vps:
     needs: build-and-push
     runs-on: ubuntu-latest
     environment: VPS_DEV
@@ -143,13 +143,24 @@ jobs:
             -e Allergy__PeanutAllergyId='${{ secrets.PNUT_ALGY_ID }}' \
             --name "${container_name}" ghcr.io/${owner}/dev-safebite-api:${version}
 
-            echo "API Healthcheck"
             sleep 10
+            echo "Deployed"
 
-            status_code=$(curl -k -s -o /dev/null -w "%{http_code}" https://localhost:9443/api/HealthCheck)
-            if [ "$status_code" = "200" ]; then
-              echo "Healthcheck OK (200) - Deployed."
-            else
-              echo "Healthcheck FAILED (HTTP $status_code) - Deployment failed."
-              exit 1
-            fi
+  peform-healthcheck:
+    needs: deploy-to-vps
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for API healthcheck
+        run: |
+            set -e
+            for i in {1..15}; do
+              status_code=$(curl -k -s -o /dev/null -w "%{http_code}" "https://dev.chimpchonkserver.duckdns.org/api/healthcheck" || true)
+              echo "Attempt $i - HTTP status: $status_code"
+              if [ "$status_code" = "200" ]; then
+                echo "Healthcheck OK (200)."
+                exit 0
+              fi
+              sleep 2
+            done
+            echo "Healthcheck failed (never got HTTP 200)."
+            exit 1
