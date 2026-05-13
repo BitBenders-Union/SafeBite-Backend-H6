@@ -1,7 +1,7 @@
 name: Test, Build and Deploy Prod Backend
 
 on:
-  pull_request:
+  push:
     branches:
       - master
   workflow_dispatch:
@@ -123,7 +123,8 @@ jobs:
             docker ps -a --filter "name=${container_name}" --format "{{.ID}}" | xargs -r docker rm -f
 
             echo "Running new Prod container with HTTPS enabled..."
-            docker run -d -p 8080:80 -p 8443:443 --network safebite-prod-network \
+            docker run -d --restart unless-stopped \
+            -p 8080:80 -p 8443:443 --network safebite-prod-network \
             -v /etc/letsencrypt/live/chimpchonkserver.duckdns.org:/https:ro \
             -e ConnectionStrings__AppConnection='${{ secrets.APP_DB }}' \
             -e ConnectionStrings__AuthConnection='${{ secrets.AUTH_DB }}' \
@@ -140,9 +141,18 @@ jobs:
             -e Email__Host='${{ secrets.EMAIL_HOST }}' \
             -e Email__Port='587' \
             -e Email__EnableSsl='true' \
+            -e Seed__AdminEmail='${{ secrets.ADMIN_EMAIL }}' \
+            -e Seed__AdminPassword='${{ secrets.ADMIN_PASS }}' \
             --name "${container_name}" ghcr.io/${owner}/prod-safebite-api:${version}
 
             sleep 10
+            status_code=$(curl -k -s -o /dev/null -w "%{http_code}" https://localhost:8443/api/HealthCheck)
+            if [ "$status_code" = "200" ]; then
+              echo "Healthcheck OK (200) - Deployed."
+            else
+              echo "Healthcheck FAILED (HTTP $status_code) - Deployment failed."
+              exit 1
+            fi
             echo "Deployed"
 
   peform-healthcheck:
