@@ -141,6 +141,8 @@ jobs:
             -e Email__Host='${{ secrets.EMAIL_HOST }}' \
             -e Email__Port='587' \
             -e Email__EnableSsl='true' \
+            -e Seed__AdminEmail='${{ secrets.ADMIN_EMAIL }}' \
+            -e Seed__AdminPassword='${{ secrets.ADMIN_PASS }}' \
             --name "${container_name}" ghcr.io/${owner}/prod-safebite-api:${version}
 
             sleep 10
