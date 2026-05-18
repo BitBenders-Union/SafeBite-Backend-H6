@@ -80,4 +80,11 @@ public class ScanRepository : BaseRepository<Scan>, IScanRepository
         return await _context.Scans
             .FirstOrDefaultAsync(s => s.Id == scanId && s.UserId == userId);
     }
+
+    public async Task<Scan?> GetScanWithCustomAllergyByUserAndCustomAllergyIdAsync(string userId, Guid customAllergyId)
+    {
+        return await _context.Scans.AsNoTracking().AsSplitQuery().Where(s => s.UserId == userId).Include(s => s.DetectedAllergies
+               .Where(d => d.CustomAllergyId == customAllergyId)).ThenInclude(d => d.CustomAllergy)
+               .FirstOrDefaultAsync(s => s.DetectedAllergies.Any(d => d.CustomAllergyId == customAllergyId));
+    }
 }

@@ -3,10 +3,12 @@
 public class CustomAllergyService : ICustomAllergyService
 {
     private readonly ICustomAllergyRepository _repository;
+    private readonly IScanRepository _scanRepository;
 
-    public CustomAllergyService(ICustomAllergyRepository repository)
+    public CustomAllergyService(ICustomAllergyRepository repository, IScanRepository scanRepository)
     {
         _repository = repository;
+        _scanRepository = scanRepository;
     }
 
     public async Task<PagedResult<CustomAllergyResponse>> GetCustomAllergiesPagedAsync(string userId, PaginationParameters parameters, string? searchTerm = null)
@@ -62,16 +64,44 @@ public class CustomAllergyService : ICustomAllergyService
 
     public async Task<bool> DeleteAllergyAsync(Guid customAllergyId, string userId)
     {
+        bool deleted = false;
+
         if (customAllergyId == Guid.Empty)
             throw new ArgumentException("Id cannot be empty.", nameof(customAllergyId));
 
         if (string.IsNullOrWhiteSpace(userId))
             throw new ArgumentException("UserId cannot be empty or whitespace.", nameof(userId));
 
-        bool deleted = await _repository.DeleteAsync(customAllergyId, userId);
+        var allergy = await GetCustomAllergyByIdAsync(customAllergyId, userId);
+        if(allergy == null)
+            throw new ArgumentNullException("Custom Allergy not found.", nameof(customAllergyId));
 
-        if (deleted)
-            await _repository.SaveChangesAsync();
+        var isUsedInScan = await _scanRepository.GetScanWithCustomAllergyByUserAndCustomAllergyIdAsync(userId, customAllergyId);
+
+        if (isUsedInScan != null)
+        {
+            try
+            {
+                CustomAllergyMappings.ToEntityForUserUpdate(allergy,"");
+                _repository.Update(allergy);
+                await _repository.SaveChangesAsync();
+                deleted = true;
+            }
+            catch
+            {
+                throw new ArgumentNullException("Unable to Delete custom allergi.", nameof(customAllergyId));
+            }
+        }
+        else
+            try
+            {
+                await _repository.DeleteAsync(customAllergyId, userId);
+                await _repository.SaveChangesAsync();
+            }
+            catch
+            {
+                throw new ArgumentNullException("Unable to Delete custom allergi.", nameof(customAllergyId));
+            }
 
         return deleted;
     }

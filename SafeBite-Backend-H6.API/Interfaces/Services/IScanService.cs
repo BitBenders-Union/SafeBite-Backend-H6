@@ -12,4 +12,5 @@ public interface IScanService
 
     Task<bool> DeleteAsync(string userId, Guid scanId);
     Task<int> GetTotalCountAsync();
+    Task<ScanResponse> GetScanWithCustomAllergyByUserAndCustomAllergyIdAsync(string userId, Guid customAllergyId);
 }
