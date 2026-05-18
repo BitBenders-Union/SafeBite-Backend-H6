@@ -150,4 +150,11 @@ public class ScanService : IScanService
     {
         return await _scanRepository.CountAsync();
     }
+
+    public async Task<ScanResponse> GetScanWithCustomAllergyByUserAndCustomAllergyIdAsync(string userId, Guid customAllergyId)
+    {
+        ArgumentNullException.ThrowIfNull(userId);
+        var scan = await _scanRepository.GetScanWithCustomAllergyByUserAndCustomAllergyIdAsync(userId, customAllergyId);
+        return scan is null ? null : ScanMappings.ToScanResponse(scan);
+    }
 }

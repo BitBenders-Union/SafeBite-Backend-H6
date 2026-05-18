@@ -28,4 +28,9 @@ public static class CustomAllergyMappings
         existingCustomAllergy.Name = StringHelpers.ToTitleCase(request.Name);
         existingCustomAllergy.NormalizedName = StringHelpers.NormalizeName(request.Name);
     }
+
+    public static void ToEntityForUserUpdate(CustomAllergy existingCustomAllergy, string? userId)
+    {
+        existingCustomAllergy.UserId = userId;
+    }
 }

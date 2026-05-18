@@ -6,4 +6,5 @@ public interface IScanRepository : IBaseRepository<Scan>
     Task<Scan?> GetFullScanByIdAsync(Guid scanId);
     Task<Scan?> GetFullScanByIdAsync(Guid scanId, string userId);
     Task<Scan?> GetByIdAsync(Guid scanId, string userId);
+    Task<Scan?> GetScanWithCustomAllergyByUserAndCustomAllergyIdAsync(string userId, Guid customAllergyId);
 }
