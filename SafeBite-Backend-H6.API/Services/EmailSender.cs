@@ -62,12 +62,15 @@ public class EmailSender : IEmailSender<ApplicationUser>
     {
 
         var html = $"""
-            <h1>Password Reset</h1>
-            <p>
-                Click the link below to reset your password:
-            </p>
-            <p>{resetCode}</p>
-            """;
+        <h1>Password Reset</h1>
+        <p>
+            Use the following password reset code:
+        </p>
+        <h2 style="user-select:all;-webkit-user-select:all;" >{resetCode}</h2>
+        <p>
+            If you did not request a password reset, you can ignore this email.
+        </p>
+        """;
 
         await SendEmailAsync(email, "SafeBite password reset", html);
     }
